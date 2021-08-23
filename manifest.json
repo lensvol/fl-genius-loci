@@ -1,0 +1,34 @@
+{
+  "name": "FL Genius Loci",
+  "description": "Play location-specific background music in \"Fallen London\"",
+  "version": "1.0",
+  "manifest_version": 3,
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": [
+    "activeTab",
+    "tabs",
+    "scripting"
+  ],
+  "host_permissions":[
+    "https://www.fallenlondon.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://www.fallenlondon.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "web_accessible_resources": [
+    {"resources": ["tracks/*.mp3"], "matches":  ["https://www.fallenlondon.com/*"]},
+    {"resources": ["inject.js"], "matches":  ["https://www.fallenlondon.com/*"]}
+  ],
+  "icons": {
+    "16": "/images/piano-icon-16.png",
+    "32": "/images/piano-icon-32.png",
+    "48": "/images/piano-icon-48.png",
+    "128": "/images/piano-icon-128.png"
+  }
+}
