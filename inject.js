@@ -119,6 +119,9 @@
                     }
                 });
                 window.dispatchEvent(event);
+                // chrome.runtime.sendMessage({location: newLocation}, (response) => {
+                //     console.debug(`Playing: ${response.track}`);
+                // });
             }
         }
     }
