@@ -8,8 +8,13 @@ s.onload = function() {
 (document.head || document.documentElement).appendChild(s);
 
 window.addEventListener("LocationChanged", function (event) {
-    console.debug("Passing message to background worker...");
-    chrome.runtime.sendMessage({location: event.detail.location}, (response) => {
-        console.debug(`Playing: ${response.track}`);
+    chrome.runtime.sendMessage({action: "location", location: event.detail.location}, (response) => {
+        if (response.track != null) {
+            console.debug(`Playing: ${response.track}`);
+        } else {
+            console.debug("No track is playing at the moment.");
+        }
     });
-})
+});
+
+chrome.runtime.sendMessage({action: "hello"}, (response) => {});

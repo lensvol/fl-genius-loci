@@ -50,33 +50,56 @@ let trackMapping = {
 
 let currentAudio = new Audio();
 let currentTrackPath = "";
-currentAudio.addEventListener("ended", function () {
-    console.debug("Track has ended.");
-})
+
+let flTabs = [];
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    let location = request.location
+    if (request.action === "hello") {
+        console.log(`Tab ${sender.tab.id} opened!`);
 
-    if (location in trackMapping && trackMapping[location] !== "") {
-        console.log(`Playing track ${trackMapping[location]} for ${location}`)
-        let trackLocation = chrome.runtime.getURL("tracks/" + trackMapping[location]);
-
-        if (currentTrackPath !== trackLocation) {
-            currentTrackPath = trackLocation;
-            currentAudio.pause()
-            currentAudio.src = chrome.runtime.getURL("tracks/" + trackMapping[location]);
-            currentAudio.play()
-        } else {
-            console.log("It is the same track as one playing now!")
+        if (!flTabs.includes(sender.tab.id)) {
+            flTabs.push(sender.tab.id);
         }
-    } else {
-        currentTrackPath = "";
-        currentAudio.pause();
+
+        sendResponse();
     }
 
-    sendResponse({track: currentTrackPath});
+    if (request.action === "location") {
+        let location = request.location
+
+        if (location in trackMapping && trackMapping[location] !== "") {
+            console.log(`Playing track ${trackMapping[location]} for ${location}`)
+            let trackLocation = chrome.runtime.getURL("tracks/" + trackMapping[location]);
+
+            if (currentTrackPath !== trackLocation) {
+                currentTrackPath = trackLocation;
+                currentAudio.pause()
+                currentAudio.loop = true;
+                currentAudio.src = chrome.runtime.getURL("tracks/" + trackMapping[location]);
+                currentAudio.play()
+            } else {
+                console.log("It is the same track as one playing now!")
+            }
+        } else {
+            currentTrackPath = "";
+            currentAudio.pause();
+        }
+
+        sendResponse({track: currentTrackPath});
+    }
 });
 
-chrome.tabs.onActivated.addListener(function(activeInfo) {
+chrome.tabs.onActivated.addListener((activeInfo) => {
+    if (flTabs.includes(activeInfo.tabId)) {
+        currentAudio.play();
+    } else {
+        currentAudio.pause();
+    }
+});
 
+chrome.tabs.onRemoved.addListener((tabId, removeInfo) => {
+    console.log("Before:", flTabs);
+    if (index !== -1) {
+        flTabs.splice(index, 1);
+    }
 });
