@@ -39,7 +39,7 @@ let trackMapping = {
     // "": "16 The Appointed Place.mp3",
     // "": "17 A Sundered Sea.mp3",
     // Cave of Nadir
-    "Cave of Nadir": "18 Irrigo Below.mp3",
+    "Cave of the Nadir": "18 Irrigo Below.mp3",
     // Flute Street
     "Flute Street": "19 Something of a Fluke.mp3",
     "Dept. of Menace Eradication": "20 The Department of Menace Eradication.mp3",

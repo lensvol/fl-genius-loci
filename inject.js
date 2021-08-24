@@ -51,7 +51,10 @@
         109643: "Tanah-Chook",
         58: "Iron Republic",
         36: "Broad Unterzee",
+        // Setting: "Nadir"
+        6709: "Cave of the Nadir",
         105438: "Heartscross House",
+        111079: "Base Camp",
         111111: "Abbey Rock",
         111186: "Khan's Heart",
         111194: "Copper Quarter",
