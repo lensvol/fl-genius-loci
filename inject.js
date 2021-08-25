@@ -4,14 +4,33 @@
     window.interceptor = true;
     const DONE = 4;
 
+    let authToken = "";
+
     // <div style="display: flex; align-items: flex-end;">
     //     <span><i className="fa fa-map-marker" aria-hidden="true"></i>&nbsp;<b>Mutton Island</b>&nbsp;<i>(ID: 38)</i></span>
     // </div>
+
+    const SETTING_IDS_TO_LOCATION = {
+        2: "Fifth City",
+        4: "Death",
+        10: "Parabola",
+        16: "Southern Archipelago",
+        19: "An Elaborate Party",
+        106005: "Laboratory",
+        107941: "Upper River",
+        104028: "Port Carnelian",
+        104684: "Elder Continent",
+        107959: "Khanate (Copper Quarter)",
+        107955: "Khanate (Inner)",
+        107951: "Aboard, at Port",
+        107952: "Zailing the Unterzee",
+    };
 
     const AREA_IDS_TO_LOCATION = {
         2: "Your Lodgings",
         3: "Wolfstack Docks",
         6: "Veilgarden",
+        14: "A boat trip",
         111073: "Singing Mandrake",
         23: "University",
         111064: "Clay Quarters",
@@ -67,31 +86,74 @@
         // A boat trip
         // Veilgarden
         // A state of some confusion
+        111138: "Bone Market",
+        111141: "Balmoral",
+        111094: "Magistracy of the Evenlode",
+        111092: "Ealing Gardens",
+        111145: "Hurlers",
+        111149: "Moulin",
+        111146: "Marigold Station",
+        111143: "Burrow-Infra-Mump",
     }
 
-    var currentArea = null;
+    let currentArea = "UNKNOWN";
+    let currentSetting = "UNKNOWN";
 
-    function modifyResponse(response) {
+    function notifyLocationChanged(newSetting, newLocation) {
+        let event = new CustomEvent("LocationChanged", {
+            detail: {location: newLocation, setting: newSetting}
+        })
+        window.dispatchEvent(event);
+    }
+
+    function parseResponse(response) {
         if (this.readyState === DONE) {
             // TODO: Proper URL matching
             let areaId = null;
             let areaName = null;
+            let settingId = null;
+            let settingName = null;
 
             let targetUrl = response.currentTarget.responseURL;
 
-            if (!(targetUrl.includes("/api/map") && targetUrl.includes("fallenlondon"))) {
+            if (!((targetUrl.includes("/api/map") || targetUrl.includes("/choosebranch") || targetUrl.includes("/myself")) && targetUrl.includes("fallenlondon"))) {
                 return;
             }
 
             let data = JSON.parse(response.target.responseText);
-            if (data["isSuccess"] !== true) {
-                // TODO: Implement heuristics to detect special regions like Parabola or Nadir
-                currentArea == null;
-                let event = new CustomEvent("LocationChanged", {
-                    detail: {location: "UNKNOWN"}
+            if (targetUrl.includes("/api/map") && !data.isSuccess) {
+                console.log("Map cannot be accessed, detecting through user info...")
+
+                userRequest = new XMLHttpRequest();
+                userRequest.open = originalAjaxOpen;
+                userRequest.setRequestHeader = originalSetRequest;
+
+                userRequest.open("GET", "https://api.fallenlondon.com/api/login/user", true);
+                userRequest.setRequestHeader("Authorization", authToken);
+                userRequest.addEventListener("readystatechange", (userResponse) => {
+                    if (userRequest.readyState === DONE && userRequest.status === 200) {
+                        console.debug("User info received!");
+
+                        let userData = JSON.parse(userResponse.target.responseText);
+                        let area = userData.area;
+                        if (area.id in AREA_IDS_TO_LOCATION) {
+                            console.log(`User is now at ${area.name} (ID: ${area.id})`);
+                            currentArea = AREA_IDS_TO_LOCATION[area.id]
+                            notifyLocationChanged(currentSetting, currentArea);
+                        } else {
+                            console.log("User location is unknown, falling back to setting.");
+                            notifyLocationChanged(currentSetting, "UNKNOWN");
+                        }
+                    }
                 })
-                window.dispatchEvent(event);
+                userRequest.send();
                 return;
+            }
+
+            if (targetUrl.endsWith("/myself")) {
+                settingId = data.character.setting.id;
+                settingName = data.character.setting.name;
+                console.log(`Current setting is ${settingName} (ID: ${settingId})`);
             }
 
             if (targetUrl.endsWith("/api/map")) {
@@ -102,29 +164,47 @@
                 areaId = data["area"].id;
                 areaName = data["area"].name;
                 console.log(`We moved to ${data["area"].name} (ID: ${data["area"].id})`);
+            } else if (targetUrl.endsWith("/api/storylet/choosebranch")) {
+                if ("messages" in data) {
+                    data.messages.forEach((message) => {
+                        if ("area" in message) {
+                            areaId = message.area.id;
+                            areaName = message.area.name;
+
+                            console.log(`We transitioned to ${areaName} (${areaId})`);
+                        } else if ("setting" in message) {
+                            settingId = message.setting.id;
+                            settingName = message.setting.name;
+
+                            console.log(`New setting: ${settingName} (${settingId})`);
+                        }
+                    })
+                }
             }
 
-            let event = null;
-            let newLocation = null;
+            let newSetting = "UNKNOWN";
+            let newLocation = "UNKNOWN";
+
+            if (settingId in SETTING_IDS_TO_LOCATION) {
+                if (currentSetting !== SETTING_IDS_TO_LOCATION[settingId]) {
+                    currentSetting = newSetting = SETTING_IDS_TO_LOCATION[settingId];
+                }
+            } else {
+                newSetting = "UNKNOWN";
+                currentSetting = "UNKNOWN";
+            }
+
             if (areaId in AREA_IDS_TO_LOCATION) {
                 if (currentArea !== AREA_IDS_TO_LOCATION[areaId]) {
                     currentArea = newLocation = AREA_IDS_TO_LOCATION[areaId];
                 }
             } else {
                 newLocation = "UNKNOWN";
-                currentArea = null;
+                currentArea = "UNKNOWN";
             }
 
-            if (newLocation != null) {
-                event = new CustomEvent("LocationChanged", {
-                    detail: {
-                        location: newLocation
-                    }
-                });
-                window.dispatchEvent(event);
-                // chrome.runtime.sendMessage({location: newLocation}, (response) => {
-                //     console.debug(`Playing: ${response.track}`);
-                // });
+            if (newLocation !== "UNKNOWN" || newSetting !== "UNKNOWN") {
+                notifyLocationChanged(newSetting, newLocation);
             }
         }
     }
@@ -141,10 +221,24 @@
      */
     function openBypass(original_function) {
         return function (method, url, async) {
-            this.addEventListener("readystatechange", modifyResponse);
+            this.addEventListener("readystatechange", parseResponse);
             return original_function.apply(this, arguments);
         };
     }
 
+    function installAuthSniffer(original_function) {
+        return function (name, value) {
+            if (name === "Authorization" && value !== authToken) {
+                authToken = value;
+                console.debug("Got auth token:", authToken);
+            }
+            return original_function.apply(this, arguments);
+        }
+    }
+
+    let originalAjaxOpen = XMLHttpRequest.prototype.open;
+    let originalSetRequest = XMLHttpRequest.prototype.setRequestHeader;
+
     XMLHttpRequest.prototype.open = openBypass(XMLHttpRequest.prototype.open);
+    XMLHttpRequest.prototype.setRequestHeader = installAuthSniffer(XMLHttpRequest.prototype.setRequestHeader);
 }())

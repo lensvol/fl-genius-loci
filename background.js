@@ -1,6 +1,7 @@
 let trackMapping = {
     "New Newgate": "01 New Newgate.mp3",
     "University": "02 An Embassy Waltz.mp3",
+    "Science Laboratory": "02 An Embassy Waltz.mp3",
     "Ladybones Road": "02 An Embassy Waltz.mp3",
     "Labyrinth of Tigers": "03 Labyrinth of Tigers.mp3",
     "Forgotten Quarter": "03 Labyrinth of Tigers.mp3",
@@ -46,6 +47,9 @@ let trackMapping = {
     // Tomb-Colonies (???)
     // "": "21 St Arthur's Candle.mp3",
     // "": "22 Why We Wear Faces.mp3",
+    "Fifth City": "",
+    "Laboratory": "",
+    "Upper River": "",
 }
 
 let currentAudio = new Audio();
@@ -66,16 +70,25 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     if (request.action === "location") {
         let location = request.location
+        let setting = request.setting
+        let trackLocation = null;
 
         if (location in trackMapping && trackMapping[location] !== "") {
-            console.log(`Playing track ${trackMapping[location]} for ${location}`)
-            let trackLocation = chrome.runtime.getURL("tracks/" + trackMapping[location]);
+            trackLocation = chrome.runtime.getURL("tracks/" + trackMapping[location]);
+            console.debug(`Selecting track ${trackLocation} for "${location} (${setting})"`);
+        } else if (setting in trackMapping && trackMapping[setting] !== "") {
+            trackLocation = chrome.runtime.getURL("tracks/" + trackMapping[setting]);
+            console.debug(`Location unknown, selecting track ${trackLocation} for setting "${setting}"`);
+        }
+
+        if (trackLocation != null) {
+            console.log(`Playing track ${trackLocation}`);
 
             if (currentTrackPath !== trackLocation) {
                 currentTrackPath = trackLocation;
                 currentAudio.pause()
                 currentAudio.loop = true;
-                currentAudio.src = chrome.runtime.getURL("tracks/" + trackMapping[location]);
+                currentAudio.src = trackLocation;
                 currentAudio.play()
             } else {
                 console.log("It is the same track as one playing now!")
@@ -98,7 +111,7 @@ chrome.tabs.onActivated.addListener((activeInfo) => {
 });
 
 chrome.tabs.onRemoved.addListener((tabId, removeInfo) => {
-    console.log("Before:", flTabs);
+    let index = flTabs.indexOf(tabId);
     if (index !== -1) {
         flTabs.splice(index, 1);
     }
