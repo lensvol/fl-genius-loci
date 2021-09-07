@@ -1,32 +1,33 @@
 let currentAudio = new Audio();
+let currentSetting = null;
 let currentTrackUrl = "";
 
 let flTabs = [];
 
-const trackMapping = new Promise((resolve, reject) => {
+const externalMapping = new Promise((resolve, reject) => {
     const mappingURL = chrome.runtime.getURL("mappings.json");
 
     fetch(mappingURL)
         .then(response => response.json())
-        .then(mappings_json => resolve(mappings_json.tracks))
+        .then(mappings_json => resolve(mappings_json))
         .catch((reason) => {
             console.error(`Could not load mappings.json: ${reason}`);
             // We should not error out if we cannot load the mapping
-            resolve({});
+            resolve({tracks: {}, settings: {}, areas: {}});
         })
 })
 
 function findTrackForLocation(setting, location) {
     return new Promise((resolve, reject) => {
-        trackMapping
+        externalMapping
             .then(mapping => {
                 let trackLocation = null;
-                if (location in mapping && mapping[location] !== "") {
+                if (location in mapping.tracks && mapping.tracks[location] !== "") {
+                    trackLocation = chrome.runtime.getURL("tracks/" + mapping.tracks[location]);
                     console.debug(`Selecting track ${trackLocation} for "${location} (${setting})"`);
-                    trackLocation = chrome.runtime.getURL("tracks/" + mapping[location]);
-                } else if (setting in mapping && mapping[setting] !== "") {
-                    console.debug(`Location unknown, selecting track ${trackLocation} for setting "${setting}"`);
-                    trackLocation = chrome.runtime.getURL("tracks/" + mapping[setting]);
+                } else if (currentSetting in mapping && mapping.tracks[currentSetting] !== "") {
+                    trackLocation = chrome.runtime.getURL("tracks/" + mapping.tracks[currentSetting]);
+                    console.debug(`Location unknown, selecting track ${trackLocation} for setting "${currentSetting}"`);
                 }
 
                 if (trackLocation != null) {
@@ -39,19 +40,22 @@ function findTrackForLocation(setting, location) {
 }
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === "hello") {
+    if (request.action === "FL_GL_hello") {
         if (!flTabs.includes(sender.tab.id)) {
             flTabs.push(sender.tab.id);
         }
 
-        sendResponse();
+        externalMapping.then(value => sendResponse(value));
     }
 
-    if (request.action === "location") {
-        let location = request.location
-        let setting = request.setting
+    if (request.action === "FL_GL_setting") {
+        currentSetting = request.setting;
+    }
 
-        findTrackForLocation(setting, location)
+    if (request.action === "FL_GL_location") {
+        let location = request.location
+
+        findTrackForLocation(currentSetting, location)
             .then(trackUrl => {
                 if (currentTrackUrl !== trackUrl) {
                     console.log(`Playing track ${trackUrl}`)

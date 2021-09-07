@@ -1,8 +1,11 @@
 (function() {
     console.log("Starting injected script.");
 
-    window.interceptor = true;
+    const originalAjaxOpen = XMLHttpRequest.prototype.open;
+    const originalSetRequest = XMLHttpRequest.prototype.setRequestHeader;
     const DONE = 4;
+
+    window.interceptor = true;
 
     let authToken = "";
 
@@ -10,7 +13,7 @@
     //     <span><i className="fa fa-map-marker" aria-hidden="true"></i>&nbsp;<b>Mutton Island</b>&nbsp;<i>(ID: 38)</i></span>
     // </div>
 
-    const SETTING_IDS_TO_LOCATION = {
+    let SETTING_IDS_TO_LOCATION = {
         2: "Fifth City",
         4: "Death",
         10: "Parabola",
@@ -28,7 +31,7 @@
         107952: "Zailing the Unterzee",
     };
 
-    const AREA_IDS_TO_LOCATION = {
+    let AREA_IDS_TO_LOCATION = {
         2: "Your Lodgings",
         3: "Wolfstack Docks",
         6: "Veilgarden",
@@ -104,9 +107,16 @@
     let currentArea = "UNKNOWN";
     let currentSetting = "UNKNOWN";
 
-    function notifyLocationChanged(newSetting, newLocation) {
-        let event = new CustomEvent("LocationChanged", {
-            detail: {location: newLocation, setting: newSetting}
+    function notifyLocationChanged(newLocation) {
+        let event = new CustomEvent("FL_GL_LocationChanged", {
+            detail: {location: newLocation}
+        })
+        window.dispatchEvent(event);
+    }
+
+    function notifySettingChanged(newSetting) {
+        let event = new CustomEvent("FL_GL_SettingChanged", {
+            detail: {setting: newSetting}
         })
         window.dispatchEvent(event);
     }
@@ -144,10 +154,10 @@
                         if (area.id in AREA_IDS_TO_LOCATION) {
                             console.log(`User is now at ${area.name} (ID: ${area.id})`);
                             currentArea = AREA_IDS_TO_LOCATION[area.id]
-                            notifyLocationChanged(currentSetting, currentArea);
+                            notifyLocationChanged(currentArea);
                         } else {
                             console.log("User location is unknown, falling back to setting.");
-                            notifyLocationChanged(currentSetting, "UNKNOWN");
+                            notifyLocationChanged("UNKNOWN");
                         }
                     }
                 })
@@ -188,7 +198,7 @@
             }
 
             let newSetting = "UNKNOWN";
-            let newLocation = "UNKNOWN";
+            let newArea = "UNKNOWN";
 
             if (settingId in SETTING_IDS_TO_LOCATION) {
                 if (currentSetting !== SETTING_IDS_TO_LOCATION[settingId]) {
@@ -196,20 +206,21 @@
                 }
             } else {
                 newSetting = "UNKNOWN";
-                currentSetting = "UNKNOWN";
             }
 
             if (areaId in AREA_IDS_TO_LOCATION) {
                 if (currentArea !== AREA_IDS_TO_LOCATION[areaId]) {
-                    currentArea = newLocation = AREA_IDS_TO_LOCATION[areaId];
+                    currentArea = newArea = AREA_IDS_TO_LOCATION[areaId];
                 }
             } else {
-                newLocation = "UNKNOWN";
-                currentArea = "UNKNOWN";
+                newArea = "UNKNOWN";
             }
 
-            if (newLocation !== "UNKNOWN" || newSetting !== "UNKNOWN") {
-                notifyLocationChanged(newSetting, newLocation);
+            if (newSetting !== "UNKNOWN") {
+                notifySettingChanged(newSetting);
+            }
+            if (newArea !== "UNKNOWN") {
+                notifyLocationChanged(newArea);
             }
         }
     }
@@ -235,15 +246,20 @@
         return function (name, value) {
             if (name === "Authorization" && value !== authToken) {
                 authToken = value;
-                console.debug("Got auth token:", authToken);
+                console.debug("Got FL auth token!");
             }
             return original_function.apply(this, arguments);
         }
     }
 
-    let originalAjaxOpen = XMLHttpRequest.prototype.open;
-    let originalSetRequest = XMLHttpRequest.prototype.setRequestHeader;
+    document.addEventListener("setMapping", (event) => {
+        SETTING_IDS_TO_LOCATION = event.detail.settings;
+        AREA_IDS_TO_LOCATION = event.detail.areas;
 
-    XMLHttpRequest.prototype.open = openBypass(XMLHttpRequest.prototype.open);
-    XMLHttpRequest.prototype.setRequestHeader = installAuthSniffer(XMLHttpRequest.prototype.setRequestHeader);
+        console.debug("Mappings received, setting up API interceptors...")
+        XMLHttpRequest.prototype.open = openBypass(XMLHttpRequest.prototype.open);
+        XMLHttpRequest.prototype.setRequestHeader = installAuthSniffer(XMLHttpRequest.prototype.setRequestHeader);
+    });
+
+    document.dispatchEvent(new CustomEvent("FL_GL_geniusLociInjected"));
 }())

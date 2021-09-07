@@ -7,11 +7,10 @@ s.onload = function () {
 };
 (document.head || document.documentElement).appendChild(s);
 
-window.addEventListener("LocationChanged", function (event) {
+window.addEventListener("FL_GL_LocationChanged", (event) => {
     chrome.runtime.sendMessage({
-        action: "location",
+        action: "FL_GL_location",
         location: event.detail.location,
-        setting: event.detail.setting
     }, (response) => {
         if (response.track === null) {
             console.debug("No track should be playing at the moment.");
@@ -23,5 +22,21 @@ window.addEventListener("LocationChanged", function (event) {
     });
 });
 
+window.addEventListener("FL_GL_SettingChanged", (event) => {
+    chrome.runtime.sendMessage({
+        action: "FL_GL_setting",
+        setting: event.detail.setting
+    }, () => {});
+});
 
-chrome.runtime.sendMessage({action: "hello"}, () => {});
+document.addEventListener("FL_GL_geniusLociInjected", (event) => {
+    chrome.runtime.sendMessage({action: "FL_GL_hello"}, (mapping) => {
+        const settingsEvent = new CustomEvent("setMapping", {
+            detail: {
+                settings: mapping.settings,
+                areas: mapping.areas,
+            }
+        });
+        document.dispatchEvent(settingsEvent);
+    });
+});
