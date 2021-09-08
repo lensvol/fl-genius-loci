@@ -7,6 +7,27 @@ Browser extension for [Fallen London](https://www.fallenlondon.com/) that plays 
 Grab it from:
 * [Releases page](https://github.com/lensvol/fl-genius-loci/releases) (most up-to-date, see below for instructions)
 
+**NB: No music files are supplied with the extension! You'll have to provide
+your own copy of [Fallen London OST](https://failbettergames.bandcamp.com/album/fallen-london-ost) or any other track.** 
+
+## Setting up
+
+* Close any Fallen Londons tabs before you start. 
+
+* First, install the extension using the [instructions](#manual-installation) provided below.
+
+* Second, open the folder where you unzipped the extension and find `tracks` subfolder. If you having trouble,
+just search your computer for `OST_GOES_HERE` file which is contained within. This is
+the place where your MP3 (or OGG) files should go so that extension can discover them.
+
+* By default, extension is expecting to see files from the [official Fallen London OST](https://failbettergames.bandcamp.com/album/fallen-london-ost). If your version's
+files are named differently or you want to use completely different set of files, just modify
+`tracks` section in [`mappings.json`](https://github.com/lensvol/fl-genius-loci/blob/main/mappings.json) located
+in the directory where you unzipped the extension.
+
+* That's it! Now if you visit any Fallen London location covered by the extension you should start hearing an appropriate track on the loop.
+
+
 ## Manual installation
 
 ### Chrome
@@ -16,7 +37,7 @@ Grab it from:
 3. Open _Chrome_.
 4. Go to **chrome://extensions** and
 5. Check the box for "Developer Mode" (top right corner).
-6. Click **Load unpacked extension** and select the folder where you unzipped the file.
+6. Click **Load unpacked extension** and select the folder where you unzipped the file. 
 
 ### Mozilla Firefox
 
@@ -40,4 +61,4 @@ Grab it from:
 * Add customization guide
 * Settings page
 * Location tracker
-* Do not mute when visiting Fallen London Wiki tab
+* Current track indicator
