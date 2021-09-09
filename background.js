@@ -21,10 +21,10 @@ function findTrackForLocation(setting, location) {
         externalMapping
             .then(mapping => {
                 if (location in mapping.tracks && mapping.tracks[location] !== "") {
-                    console.debug(`Selecting track ${trackLocation} for "${location} (${setting})"`);
+                    console.debug(`Selecting track ${mapping.tracks[location]} for "${location} (${currentSetting})"`);
                     resolve(mapping.tracks[location])
                 } else if (currentSetting in mapping && mapping.tracks[currentSetting] !== "") {
-                    console.debug(`Location unknown, selecting track ${trackLocation} for setting "${currentSetting}"`);
+                    console.debug(`Location unknown, selecting track ${mapping.tracks[currentSetting]} for setting "${currentSetting}"`);
                     resolve(mapping.tracks[currentSetting])
                 }
 
