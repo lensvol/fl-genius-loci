@@ -20,20 +20,15 @@ function findTrackForLocation(setting, location) {
     return new Promise((resolve, reject) => {
         externalMapping
             .then(mapping => {
-                let trackLocation = null;
                 if (location in mapping.tracks && mapping.tracks[location] !== "") {
-                    trackLocation = chrome.runtime.getURL("tracks/" + mapping.tracks[location]);
                     console.debug(`Selecting track ${trackLocation} for "${location} (${setting})"`);
+                    resolve(mapping.tracks[location])
                 } else if (currentSetting in mapping && mapping.tracks[currentSetting] !== "") {
-                    trackLocation = chrome.runtime.getURL("tracks/" + mapping.tracks[currentSetting]);
                     console.debug(`Location unknown, selecting track ${trackLocation} for setting "${currentSetting}"`);
+                    resolve(mapping.tracks[currentSetting])
                 }
 
-                if (trackLocation != null) {
-                    resolve(trackLocation);
-                } else {
-                    reject("No appropriate track found.");
-                }
+                reject("No appropriate track found.");
             })
     });
 }
@@ -51,6 +46,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         let location = request.location
 
         findTrackForLocation(currentSetting, location)
+            .then(trackPath => chrome.runtime.getURL("tracks/" + trackPath))
             .then(trackUrl => {
                 if (currentTrackUrl !== trackUrl) {
                     console.log(`Playing track ${trackUrl}`)
@@ -83,14 +79,16 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 chrome.browserAction.onClicked.addListener((tab) => {
     if (isMuted) {
         isMuted = false;
-        if (currentAudio.src !== "") {
+        if (currentAudio.currentSrc !== "") {
             currentAudio.play();
         }
     } else {
         isMuted = true;
         currentAudio.pause();
     }
-    chrome.browserAction.setBadgeText({text: isMuted ? " OFF" : " ON " }, () => {});
+    chrome.browserAction.setBadgeText({text: isMuted ? "MUTE" : "" }, () => {});
+    chrome.browserAction.setBadgeBackgroundColor({color: isMuted ? "#ff0000" : "#0000ff"});
 });
 
-chrome.browserAction.setBadgeText({text: isMuted ? " OFF" : " ON " }, () => {});
+chrome.browserAction.setBadgeText({text: isMuted ? "MUTE" : "" }, () => {});
+chrome.browserAction.setBadgeBackgroundColor({color: isMuted ? "#ff0000" : "#0000ff"});
