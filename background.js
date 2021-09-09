@@ -1,8 +1,7 @@
 let currentAudio = new Audio();
 let currentSetting = null;
 let currentTrackUrl = "";
-
-let flTabs = [];
+let isMuted = false;
 
 const externalMapping = new Promise((resolve, reject) => {
     const mappingURL = chrome.runtime.getURL("mappings.json");
@@ -41,10 +40,6 @@ function findTrackForLocation(setting, location) {
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "FL_GL_hello") {
-        if (!flTabs.includes(sender.tab.id)) {
-            flTabs.push(sender.tab.id);
-        }
-
         externalMapping.then(value => sendResponse(value));
     }
 
@@ -63,7 +58,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                     currentAudio.pause();
                     currentAudio.loop = true;
                     currentAudio.src = trackUrl;
-                    currentAudio.play()
+
+                    if (!isMuted) {
+                        currentAudio.play();
+                    }
                 } else {
                     console.log("It is the same track as before!");
                 }
@@ -82,22 +80,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
 });
 
-chrome.tabs.onActivated.addListener((activeInfo) => {
-    if (flTabs.includes(activeInfo.tabId)) {
-        currentAudio.play();
+chrome.browserAction.onClicked.addListener((tab) => {
+    if (isMuted) {
+        isMuted = false;
+        if (currentAudio.src !== "") {
+            currentAudio.play();
+        }
     } else {
+        isMuted = true;
         currentAudio.pause();
     }
+    chrome.browserAction.setBadgeText({text: isMuted ? " OFF" : " ON " }, () => {});
 });
 
-chrome.tabs.onRemoved.addListener((tabId, removeInfo) => {
-    let index = flTabs.indexOf(tabId);
-    if (index !== -1) {
-        flTabs.splice(index, 1);
-    }
-
-    if (flTabs.length === 0) {
-        currentAudio.pause();
-        currentAudio.src = "";
-    }
-});
+chrome.browserAction.setBadgeText({text: isMuted ? " OFF" : " ON " }, () => {});

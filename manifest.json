@@ -23,6 +23,15 @@
     "tracks/*.mp3",
     "inject.js"
   ],
+  "browser_action": {
+    "default_icon": {
+      "16": "/images/piano-icon-16.png",
+      "32": "/images/piano-icon-32.png",
+      "48": "/images/piano-icon-48.png",
+      "128": "/images/piano-icon-128.png"
+    },
+    "default_title": "FL Genius Loci"
+  },
   "icons": {
     "16": "/images/piano-icon-16.png",
     "32": "/images/piano-icon-32.png",
