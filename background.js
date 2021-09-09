@@ -1,5 +1,6 @@
 let currentAudio = new Audio();
 let currentSetting = null;
+let currentLocation = null;
 let currentTrackUrl = "";
 let isMuted = false;
 
@@ -33,6 +34,10 @@ function findTrackForLocation(setting, location) {
     });
 }
 
+function updateBadgeTooltip() {
+    chrome.browserAction.setTitle({"title": `Setting: ${currentSetting}\nLocation: ${currentLocation}`}, () => {});
+}
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "FL_GL_hello") {
         externalMapping.then(value => sendResponse(value));
@@ -40,10 +45,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     if (request.action === "FL_GL_setting") {
         currentSetting = request.setting;
+        updateBadgeTooltip();
+        sendResponse({});
     }
 
     if (request.action === "FL_GL_location") {
-        let location = request.location
+        let location = request.location;
+        currentLocation = location;
+        updateBadgeTooltip();
 
         findTrackForLocation(currentSetting, location)
             .then(trackPath => chrome.runtime.getURL("tracks/" + trackPath))
