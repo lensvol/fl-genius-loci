@@ -351,7 +351,7 @@
         }
     }
 
-    document.addEventListener("setMapping", (event) => {
+    document.addEventListener("FL_GL_setMapping", (event) => {
         SETTING_IDS_TO_LOCATION = event.detail.settings;
         AREA_IDS_TO_LOCATION = event.detail.areas;
 

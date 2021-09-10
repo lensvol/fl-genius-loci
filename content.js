@@ -41,7 +41,7 @@ window.addEventListener("FL_GL_SettingChanged", (event) => {
 
 document.addEventListener("FL_GL_geniusLociInjected", (event) => {
     chrome.runtime.sendMessage({action: "FL_GL_hello"}, (mapping) => {
-        const settingsEvent = new CustomEvent("setMapping", {
+        const settingsEvent = new CustomEvent("FL_GL_setMapping", {
             detail: {
                 settings: mapping.settings,
                 areas: mapping.areas,
