@@ -106,103 +106,11 @@
 
     let authToken = "";
 
-    // <div style="display: flex; align-items: flex-end;">
-    //     <span><i className="fa fa-map-marker" aria-hidden="true"></i>&nbsp;<b>Mutton Island</b>&nbsp;<i>(ID: 38)</i></span>
-    // </div>
-
-    let SETTING_IDS_TO_LOCATION = {
-        2: "Fifth City",
-        4: "Death",
-        10: "Parabola",
-        16: "Southern Archipelago",
-        19: "An Elaborate Party",
-        106005: "Laboratory",
-        107954: "Working with the Clay Highwayman",
-        107941: "Upper River",
-        104028: "Port Carnelian",
-        104684: "Elder Continent",
-        107959: "Khanate (Copper Quarter)",
-        107955: "Khanate (Inner)",
-        107950: "Under Parabolan Ice",
-        107951: "Aboard, at Port",
-        107952: "Zailing the Unterzee",
-    };
-
-    let AREA_IDS_TO_LOCATION = {
-        2: "Your Lodgings",
-        3: "Wolfstack Docks",
-        6: "Veilgarden",
-        14: "A boat trip",
-        111073: "Singing Mandrake",
-        23: "University",
-        46: "Mind of a Long-Dead God",
-        111064: "Clay Quarters",
-        111065: "Moloch Street",
-        111066: "Concord Square",
-        111072: "Dept. of Menace Eradication",
-        111153: "Adulterine Castle",
-        111157: "Home Waters",
-        111158: "Shepherd's Wash",
-        111159: "Sea of Voices",
-        111160: "Salt Steppes",
-        111187: "Snares",
-        111161: "Pillared Sea",
-        111162: "Stormbones",
-        111182: "Clay Highwayman's Camp",
-        4: "Ladybones Road",
-        28: "Labyrinth of Tigers",
-        9: "Forgotten Quarter",
-        34: "House of Chimes",
-        31: "Bazaar Side-Streets",
-        7: "Spite",
-        4138: "Crowds of Spite",
-        26: "Empress' Court",
-        10: "Shuttered Palace",
-        11: "Flit",
-        18: "Mrs Plenty's Carnival",
-        30: "Mahogany Hall",
-        47: "Doubt Stree",
-        42: "Wilmot's End",
-        45: "Foreign Office",
-        35: "Flute Street",
-        37: "Hunter's Keep",
-        38: "Mutton Island",
-        48: "Bullbone Island",
-        49: "Corpsecage Island",
-        50: "Grunting Fen",
-        17: "Disgraced Exile",
-        25: "Venderbright",
-        109643: "Tanah-Chook",
-        58: "Iron Republic",
-        36: "Broad Unterzee",
-        // Setting: "Nadir"
-        6709: "Cave of the Nadir",
-        105438: "Heartscross House",
-        111079: "Base Camp",
-        111111: "Abbey Rock",
-        111186: "Khan's Heart",
-        111194: "Copper Quarter",
-        111156: "Your Cabin",
-        111185: "On Deck",
-        111184: "Poring over the Maps",
-        111082: "Blind Helmsman",
-        110041: "Court of the Wakeful Eye",
-        53: "Polythreme",
-        // A boat trip
-        // Veilgarden
-        // A state of some confusion
-        111138: "Bone Market",
-        111141: "Balmoral",
-        111094: "Magistracy of the Evenlode",
-        111092: "Ealing Gardens",
-        111145: "Hurlers",
-        111149: "Moulin",
-        111146: "Marigold Station",
-        111143: "Burrow-Infra-Mump",
-    }
-
-    let currentArea = "UNKNOWN";
+    let SETTING_IDS_TO_LOCATION = {};
     let currentSetting = "UNKNOWN";
+
+    let AREA_IDS_TO_LOCATION = {}
+    let currentArea = "UNKNOWN";
 
     function notifyLocationChanged(newLocation) {
         let event = new CustomEvent("FL_GL_LocationChanged", {
