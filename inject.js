@@ -275,17 +275,6 @@
 
     document.dispatchEvent(new CustomEvent("FL_GL_geniusLociInjected"));
 
-    const debugContentObserver = new MutationObserver((mutations, observer) => {
-        mutations.map((mutation) => {
-            if (mutation.target.nodeName === "DIV") {
-                mutation.addedNodes.map((node) => console.log(mutation.target, "add", node));
-                mutation.removedNodes.map((node) => console.log(mutation.target, "remove", node));
-
-                console.debug("-----------------------------------------")
-            }
-        });
-    });
-
     const buttonInsertObserver = new MutationObserver((mutations, observer) => {
         for (let m = 0; m < mutations.length; m++) {
             let mutation = mutations[m];
@@ -320,6 +309,6 @@
         }
     });
 
-    //debugContentObserver.observe(document, {childList: true, subtree: true});
+
     buttonInsertObserver.observe(document, {childList: true, subtree: true});
 }())
