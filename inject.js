@@ -60,7 +60,7 @@
         trackLabel.style.cssText = "margin-right: 6px";
         trackLabel.innerText = "Track:"
         const trackText = document.createElement("b");
-        trackText.setAttribute("id", "current-setting-text");
+        trackText.setAttribute("id", "current-track-text");
         trackText.innerText = "None assigned";
         trackDiv.appendChild(trackLabel);
         trackDiv.appendChild(trackText);
