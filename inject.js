@@ -305,7 +305,6 @@
     });
 
     document.addEventListener("FL_GL_track", (event) => {
-        debugger;
         trackDisplay.innerText = event.detail.message;
     });
 

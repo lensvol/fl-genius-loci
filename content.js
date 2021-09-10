@@ -22,7 +22,6 @@ window.addEventListener("FL_GL_LocationChanged", (event) => {
             console.debug(`Playing: ${response.track}`);
             message = response.track.replace("tracks/", "");
         }
-        debugger;
         const settingsEvent = new CustomEvent("FL_GL_track", {
             detail: {
                 message: message,
