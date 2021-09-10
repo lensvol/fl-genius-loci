@@ -259,22 +259,6 @@
         }
     }
 
-    document.addEventListener("FL_GL_setMapping", (event) => {
-        SETTING_IDS_TO_LOCATION = event.detail.settings;
-        AREA_IDS_TO_LOCATION = event.detail.areas;
-
-        console.debug("Mappings received, setting up API interceptors...")
-        XMLHttpRequest.prototype.open = openBypass(XMLHttpRequest.prototype.open);
-        XMLHttpRequest.prototype.setRequestHeader = installAuthSniffer(XMLHttpRequest.prototype.setRequestHeader);
-    });
-
-    document.addEventListener("FL_GL_track", (event) => {
-        debugger;
-        trackDisplay.innerText = event.detail.message;
-    });
-
-    document.dispatchEvent(new CustomEvent("FL_GL_geniusLociInjected"));
-
     const buttonInsertObserver = new MutationObserver((mutations, observer) => {
         for (let m = 0; m < mutations.length; m++) {
             let mutation = mutations[m];
@@ -309,6 +293,21 @@
         }
     });
 
-
     buttonInsertObserver.observe(document, {childList: true, subtree: true});
+
+    document.addEventListener("FL_GL_setMapping", (event) => {
+        SETTING_IDS_TO_LOCATION = event.detail.settings;
+        AREA_IDS_TO_LOCATION = event.detail.areas;
+
+        console.debug("Mappings received, setting up API interceptors...")
+        XMLHttpRequest.prototype.open = openBypass(XMLHttpRequest.prototype.open);
+        XMLHttpRequest.prototype.setRequestHeader = installAuthSniffer(XMLHttpRequest.prototype.setRequestHeader);
+    });
+
+    document.addEventListener("FL_GL_track", (event) => {
+        debugger;
+        trackDisplay.innerText = event.detail.message;
+    });
+
+    document.dispatchEvent(new CustomEvent("FL_GL_geniusLociInjected"));
 }())
