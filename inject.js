@@ -1,12 +1,12 @@
 (function () {
-    console.log("Starting injected script.");
+    console.log("Starting injected script for 'FL Genius Loci'.");
 
     function createButton(icon, title) {
-        let buttonlet = document.createElement("button");
+        const buttonlet = document.createElement("button");
         buttonlet.setAttribute("type", "button");
         buttonlet.className = "buttonlet-container";
 
-        let outerSpan = document.createElement("span");
+        const outerSpan = document.createElement("span");
         outerSpan.classList.add("buttonlet", "fa-stack", "fa-lg", "buttonlet-enabled");
         outerSpan.setAttribute("title", title);
         outerSpan.style.cssText = "color: #ada086";
@@ -99,13 +99,9 @@
         }
     }
 
-    const originalAjaxOpen = XMLHttpRequest.prototype.open;
-    const originalSetRequest = XMLHttpRequest.prototype.setRequestHeader;
     const DONE = 4;
-    window.interceptor = true;
 
     let authToken = "";
-
     let SETTING_IDS_TO_LOCATION = {};
     let currentSetting = "UNKNOWN";
 
