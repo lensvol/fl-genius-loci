@@ -55,6 +55,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         updateBadgeTooltip();
 
         findTrackForLocation(currentSetting, location)
+            .then(trackPath => {
+                sendResponse({track: trackPath});
+                return trackPath;
+            })
             .then(trackPath => chrome.runtime.getURL("tracks/" + trackPath))
             .then(trackUrl => {
                 if (currentTrackUrl !== trackUrl) {
@@ -70,7 +74,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 } else {
                     console.log("It is the same track as before!");
                 }
-                sendResponse({track: trackUrl});
             })
             .catch((error) => {
                 console.log(`Something went wrong: ${error}`);
@@ -80,8 +83,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
                 sendResponse({track: null});
             })
-
-        sendResponse({});
     }
 });
 

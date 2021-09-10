@@ -1,10 +1,107 @@
-(function() {
+(function () {
     console.log("Starting injected script.");
+
+    function createButton(icon, title) {
+        let buttonlet = document.createElement("button");
+        buttonlet.setAttribute("type", "button");
+        buttonlet.className = "buttonlet-container";
+
+        let outerSpan = document.createElement("span");
+        outerSpan.classList.add("buttonlet", "fa-stack", "fa-lg", "buttonlet-enabled");
+        outerSpan.setAttribute("title", title);
+        outerSpan.style.cssText = "color: #ada086";
+
+        [
+            ["fa", "fa-circle", "fa-stack-2x"],
+            ["fa", "fa-inverse", "fa-stack-1x", `fa-${icon}`],
+            ["u-visually-hidden"]
+        ].map(classNames => {
+            let span = document.createElement("span");
+            span.classList.add(...classNames);
+            outerSpan.appendChild(span);
+        })
+
+        buttonlet.appendChild(outerSpan);
+        return buttonlet;
+    }
+
+    function createLocatorPanel() {
+        const stripeDiv = document.createElement("div");
+        stripeDiv.classList.add("top-stripe");//, "u-visually-hidden");
+
+        const containerDiv = document.createElement("div");
+        containerDiv.classList.add("top-stripe__inner-container");
+
+        const areaDiv = document.createElement("div");
+        areaDiv.style.cssText = "display: flex; align-items: center;";
+        const areaLabel = document.createElement("span");
+        areaLabel.style.cssText = "margin-right: 6px";
+        areaLabel.innerText = 'Area: '
+        const areaText = document.createElement("b");
+        areaText.setAttribute("id", "current-area-text");
+        areaText.innerText = "Unknown";
+        areaDiv.appendChild(areaLabel);
+        areaDiv.appendChild(areaText);
+
+        const settingDiv = document.createElement("div");
+        settingDiv.style.cssText = "display: flex; align-items: center;";
+        const settingLabel = document.createElement("span");
+        settingLabel.style.cssText = "margin-right: 6px";
+        settingLabel.innerText = 'Setting:'
+        const settingText = document.createElement("b");
+        settingText.setAttribute("id", "current-setting-text");
+        settingText.innerText = "Unknown";
+        settingDiv.appendChild(settingLabel);
+        settingDiv.appendChild(settingText);
+
+        const trackDiv = document.createElement("div");
+        trackDiv.style.cssText = "display: flex; align-items: center;";
+        const trackLabel = document.createElement("span");
+        trackLabel.style.cssText = "margin-right: 6px";
+        trackLabel.innerText = "Track:"
+        const trackText = document.createElement("b");
+        trackText.setAttribute("id", "current-setting-text");
+        trackText.innerText = "None assigned";
+        trackDiv.appendChild(trackLabel);
+        trackDiv.appendChild(trackText);
+
+        containerDiv.appendChild(settingDiv);
+        containerDiv.appendChild(areaDiv);
+        containerDiv.appendChild(trackDiv);
+        stripeDiv.appendChild(containerDiv);
+
+        stripeDiv.setAttribute("id", "locator");
+
+        return {locatorPanel: stripeDiv, settingDisplay: settingText, areaDisplay: areaText, trackDisplay: trackText};
+    }
+
+    const {locatorPanel, settingDisplay, areaDisplay, trackDisplay} = createLocatorPanel();
+
+    function updateLocatorArea(name, areaId) {
+        areaDisplay.innerText = `${name} (ID: ${areaId})`;
+    }
+
+    function updateLocatorSetting(setting, settingId) {
+        settingDisplay.innerText = `${setting} (ID: ${settingId})`;
+    }
+
+    function updateLocatorTrack(trackPath) {
+        settingDisplay.innerText = `${trackPath})`;
+    }
+
+    function toggleLocatorPanel() {
+        if (locatorPanel.classList.contains("u-visually-hidden")) {
+            console.debug("Showing locator panel...");
+            locatorPanel.classList.remove("u-visually-hidden");
+        } else {
+            console.debug("Hiding locator panel...");
+            locatorPanel.classList.add("u-visually-hidden");
+        }
+    }
 
     const originalAjaxOpen = XMLHttpRequest.prototype.open;
     const originalSetRequest = XMLHttpRequest.prototype.setRequestHeader;
     const DONE = 4;
-
     window.interceptor = true;
 
     let authToken = "";
@@ -153,7 +250,7 @@
                         let area = userData.area;
                         if (area.id in AREA_IDS_TO_LOCATION) {
                             console.log(`User is now at ${area.name} (ID: ${area.id})`);
-                            currentArea = AREA_IDS_TO_LOCATION[area.id]
+                            currentArea = AREA_IDS_TO_LOCATION[area.id];
                             notifyLocationChanged(currentArea);
                         } else {
                             console.log("User location is unknown, falling back to setting.");
@@ -217,9 +314,11 @@
             }
 
             if (newSetting !== "UNKNOWN") {
+                updateLocatorSetting(newSetting, settingId);
                 notifySettingChanged(newSetting);
             }
             if (newArea !== "UNKNOWN") {
+                updateLocatorArea(newArea, areaId);
                 notifyLocationChanged(newArea);
             }
         }
@@ -261,5 +360,58 @@
         XMLHttpRequest.prototype.setRequestHeader = installAuthSniffer(XMLHttpRequest.prototype.setRequestHeader);
     });
 
+    document.addEventListener("FL_GL_track", (event) => {
+        debugger;
+        trackDisplay.innerText = event.detail.message;
+    });
+
     document.dispatchEvent(new CustomEvent("FL_GL_geniusLociInjected"));
+
+    const debugContentObserver = new MutationObserver((mutations, observer) => {
+        mutations.map((mutation) => {
+            if (mutation.target.nodeName === "DIV") {
+                mutation.addedNodes.map((node) => console.log(mutation.target, "add", node));
+                mutation.removedNodes.map((node) => console.log(mutation.target, "remove", node));
+
+                console.debug("-----------------------------------------")
+            }
+        });
+    });
+
+    const buttonInsertObserver = new MutationObserver((mutations, observer) => {
+        for (let m = 0; m < mutations.length; m++) {
+            let mutation = mutations[m];
+
+            for (let n = 0; n < mutation.addedNodes.length; n++) {
+                let node = mutation.addedNodes[n];
+
+                if (node.nodeName.toLowerCase() === "div") {
+                    const topStripe = node.querySelector("div[class='top-stripe__inner-container']");
+
+                    if (topStripe) {
+                        console.debug("Disconnecting observer.")
+                        observer.disconnect();
+
+                        console.debug("Top stripe found!");
+                        const locatorButtonDiv = document.createElement("div");
+                        locatorButtonDiv.style.cssText = "display: flex; align-items: flex-end;";
+                        const locatorButton = createButton("music", "Toggle locator panel");
+                        locatorButton.addEventListener("click", (event) => toggleLocatorPanel());
+                        locatorButtonDiv.appendChild(locatorButton);
+
+                        console.debug("Inserting button...");
+                        topStripe.insertBefore(locatorButtonDiv, topStripe.firstChild.nextSibling);
+
+                        topStripe.parentElement.parentElement.insertBefore(locatorPanel, topStripe.parentElement.nextSibling);
+
+                        console.debug("Reconnecting observer.")
+                        observer.observe(document, {childList: true, subtree: true});
+                    }
+                }
+            }
+        }
+    });
+
+    //debugContentObserver.observe(document, {childList: true, subtree: true});
+    buttonInsertObserver.observe(document, {childList: true, subtree: true});
 }())
