@@ -112,6 +112,24 @@
     let AREA_IDS_TO_LOCATION = {}
     let currentArea = "UNKNOWN";
 
+    async function getAreaFromUserInfo() {
+        console.debug("Trying to fetch user info from server...");
+        const response = await fetch(
+            "https://api.fallenlondon.com/api/login/user",
+            {
+                headers: {
+                    "Authorization": authToken,
+                },
+            }
+        );
+        if (!response.ok) {
+            throw new Error("FL API did not like our request");
+        }
+
+        const userData = await response.json();
+        return userData.area;
+    }
+
     function notifyLocationChanged(newLocation) {
         let event = new CustomEvent("FL_GL_LocationChanged", {
             detail: {location: newLocation}
@@ -144,18 +162,8 @@
             if (targetUrl.includes("/api/map") && !data.isSuccess) {
                 console.log("Map cannot be accessed, detecting through user info...")
 
-                userRequest = new XMLHttpRequest();
-                userRequest.open = originalAjaxOpen;
-                userRequest.setRequestHeader = originalSetRequest;
-
-                userRequest.open("GET", "https://api.fallenlondon.com/api/login/user", true);
-                userRequest.setRequestHeader("Authorization", authToken);
-                userRequest.addEventListener("readystatechange", (userResponse) => {
-                    if (userRequest.readyState === DONE && userRequest.status === 200) {
-                        console.debug("User info received!");
-
-                        let userData = JSON.parse(userResponse.target.responseText);
-                        let area = userData.area;
+                getAreaFromUserInfo()
+                    .then(area => {
                         if (area.id in AREA_IDS_TO_LOCATION) {
                             console.log(`User is now at ${area.name} (ID: ${area.id})`);
                             currentArea = AREA_IDS_TO_LOCATION[area.id];
@@ -164,9 +172,8 @@
                             console.log("User location is unknown, falling back to setting.");
                             notifyLocationChanged("UNKNOWN");
                         }
-                    }
-                })
-                userRequest.send();
+                    })
+
                 return;
             }
 
