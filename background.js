@@ -49,7 +49,8 @@ function toggleMute() {
         isMuted = true;
         currentAudio.pause();
     }
-    chrome.browserAction.setBadgeText({text: isMuted ? "MUTE" : "" }, () => {});
+    chrome.browserAction.setBadgeText({text: isMuted ? "MUTE" : ""}, () => {
+    });
     chrome.browserAction.setBadgeBackgroundColor({color: isMuted ? "#ff0000" : "#0000ff"});
 
     flTabs.map((tabId) => chrome.tabs.sendMessage(tabId, {action: "muteStatus", isMuted: isMuted}));
@@ -121,3 +122,8 @@ chrome.tabs.onRemoved.addListener((tabId, removeInfo) => {
         flTabs.splice(index, 1);
     }
 });
+
+chrome.tabs.query(
+    {url: "*://*.fallenlondon.com/*"},
+    (tabs) => tabs.map((tab) => flTabs.push(tab.id))
+);
