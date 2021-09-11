@@ -23,10 +23,10 @@ function findTrackForLocation(setting, location) {
         externalMapping
             .then(mapping => {
                 if (location in mapping.tracks && mapping.tracks[location] !== "") {
-                    console.debug(`Selecting track ${mapping.tracks[location]} for "${location} (${currentSetting})"`);
+                    console.debug(`[FL Genius Loci] Selecting track ${mapping.tracks[location]} for "${location} (${currentSetting})"`);
                     resolve(mapping.tracks[location])
                 } else if (currentSetting in mapping && mapping.tracks[currentSetting] !== "") {
-                    console.debug(`Location unknown, selecting track ${mapping.tracks[currentSetting]} for setting "${currentSetting}"`);
+                    console.debug(`[FL Genius Loci] Location unknown, selecting track ${mapping.tracks[currentSetting]} for setting "${currentSetting}"`);
                     resolve(mapping.tracks[currentSetting])
                 }
 
@@ -63,7 +63,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
         chrome.tabs.sendMessage(sender.tab.id, {action: "muteStatus", isMuted: isMuted});
         externalMapping.then(value => {
-            console.debug(`Sending value mapping to tab ${sender.tab.id}...`);
+            console.debug(`[FL Genius Loci] Sending value mapping to tab ${sender.tab.id}...`);
             chrome.tabs.sendMessage(sender.tab.id, {action: "setMapping", mapping: value});
         });
     }

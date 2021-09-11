@@ -177,7 +177,7 @@
                 getAreaFromUserInfo()
                     .then(area => {
                         if (area.id in AREA_IDS_TO_LOCATION) {
-                            console.log(`User is now at ${area.name} (ID: ${area.id})`);
+                            console.log(`[FL Genius Loci] User is now at ${area.name} (ID: ${area.id})`);
                             currentArea = AREA_IDS_TO_LOCATION[area.id];
                             notifyLocationChanged(currentArea);
                             updateLocatorArea(currentArea, area.id);
@@ -194,17 +194,17 @@
             if (targetUrl.endsWith("/myself")) {
                 settingId = data.character.setting.id;
                 settingName = data.character.setting.name;
-                console.log(`Current setting is ${settingName} (ID: ${settingId})`);
+                console.log(`[FL Genius Loci] Current setting is ${settingName} (ID: ${settingId})`);
             }
 
             if (targetUrl.endsWith("/api/map")) {
                 areaId = data["currentArea"].id;
                 areaName = data["currentArea"].name;
-                console.log(`We are at ${data["currentArea"].name} (ID: ${data["currentArea"].id})`);
+                console.log(`[FL Genius Loci] We are at ${data["currentArea"].name} (ID: ${data["currentArea"].id})`);
             } else if (targetUrl.endsWith("/api/map/move")) {
                 areaId = data["area"].id;
                 areaName = data["area"].name;
-                console.log(`We moved to ${data["area"].name} (ID: ${data["area"].id})`);
+                console.log(`[FL Genius Loci] We moved to ${data["area"].name} (ID: ${data["area"].id})`);
             } else if (targetUrl.endsWith("/api/storylet/choosebranch")) {
                 if ("messages" in data) {
                     data.messages.forEach((message) => {
@@ -212,12 +212,12 @@
                             areaId = message.area.id;
                             areaName = message.area.name;
 
-                            console.log(`We transitioned to ${areaName} (${areaId})`);
+                            console.log(`[FL Genius Loci] We transitioned to ${areaName} (${areaId})`);
                         } else if ("setting" in message) {
                             settingId = message.setting.id;
                             settingName = message.setting.name;
 
-                            console.log(`New setting: ${settingName} (${settingId})`);
+                            console.log(`[FL Genius Loci] New setting: ${settingName} (${settingId})`);
                         }
                     })
                 }

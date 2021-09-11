@@ -19,7 +19,7 @@ window.addEventListener("FL_GL_LocationChanged", (event) => {
             console.debug("[FL Genius Loci] Trying to determine right track...");
             message = "Detecting...";
         } else {
-            console.debug(`Playing: ${response.track}`);
+            console.debug(`[FL Genius Loci] Playing: ${response.track}`);
             message = response.track.replace("tracks/", "");
         }
         const settingsEvent = new CustomEvent("FL_GL_track", {
