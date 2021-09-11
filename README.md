@@ -55,10 +55,11 @@ in the directory where you unzipped the extension.
 4. Enable "Developer Mode" (top right corner).
 6. Click **Load unpacked** and select the folder where you unzipped the file.
 
-
 ## TODO
 
 * Add customization guide
 * Settings page
-* Location tracker
-* Current track indicator
+
+## Special thanks
+* Saltlord, a scorn fluke - for early testing and support for the idea.
+* [Alan Huang](https://github.com/alanhuang122) - for providing the list of area IDs inside FL app.
