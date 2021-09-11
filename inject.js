@@ -74,7 +74,7 @@
         return {locatorPanel: stripeDiv, settingDisplay: settingText, areaDisplay: areaText, trackDisplay: trackText};
     }
 
-    const locatorButton = createButton("music", "Toggle locator panel", "#ada086");
+    const locatorButton = createButton("map-marker", "Toggle locator panel", "#ada086");
     const muteButton = createButton("volume-up", "Mute", "#ada086")
     const {locatorPanel, settingDisplay, areaDisplay, trackDisplay} = createLocatorPanel();
     let isMuted = false;
