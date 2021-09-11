@@ -27,7 +27,7 @@
 
     function createLocatorPanel() {
         const stripeDiv = document.createElement("div");
-        stripeDiv.classList.add("top-stripe");//, "u-visually-hidden");
+        stripeDiv.classList.add("top-stripe", "u-visually-hidden");
 
         const containerDiv = document.createElement("div");
         containerDiv.classList.add("top-stripe__inner-container");
