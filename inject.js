@@ -180,9 +180,11 @@
                             console.log(`User is now at ${area.name} (ID: ${area.id})`);
                             currentArea = AREA_IDS_TO_LOCATION[area.id];
                             notifyLocationChanged(currentArea);
+                            updateLocatorArea(currentArea, area.id);
                         } else {
                             console.log("[FL Genius Loci] User location is unknown, falling back to setting.");
                             notifyLocationChanged("UNKNOWN");
+                            updateLocatorArea("Unknown", "???");
                         }
                     })
 
