@@ -121,10 +121,3 @@ chrome.tabs.onRemoved.addListener((tabId, removeInfo) => {
         flTabs.splice(index, 1);
     }
 });
-
-chrome.browserAction.onClicked.addListener((tab) => {
-    toggleMute();
-});
-
-chrome.browserAction.setBadgeText({text: isMuted ? "MUTE" : "" }, () => {});
-chrome.browserAction.setBadgeBackgroundColor({color: isMuted ? "#ff0000" : "#0000ff"});
