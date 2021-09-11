@@ -1,0 +1,11 @@
+/* Taken from: https://dzone.com/articles/pure-css-slide-down-animation-1 */
+.expandable {
+    overflow: hidden;
+
+    transition: all .2s ease-in-out;
+    line-height: 0;
+}
+
+.expanded {
+    line-height: 1.5;
+}

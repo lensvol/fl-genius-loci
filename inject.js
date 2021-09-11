@@ -26,7 +26,7 @@
 
     function createLocatorPanel() {
         const stripeDiv = document.createElement("div");
-        stripeDiv.classList.add("top-stripe", "u-visually-hidden");
+        stripeDiv.classList.add("top-stripe", "expandable");
 
         const containerDiv = document.createElement("div");
         containerDiv.classList.add("top-stripe__inner-container");
@@ -106,12 +106,12 @@
     }
 
     function toggleLocatorPanel() {
-        if (locatorPanel.classList.contains("u-visually-hidden")) {
-            console.debug("[FL Genius Loci] Showing locator panel...");
-            locatorPanel.classList.remove("u-visually-hidden");
-        } else {
+        if (locatorPanel.classList.contains("expanded")) {
             console.debug("[FL Genius Loci] Hiding locator panel...");
-            locatorPanel.classList.add("u-visually-hidden");
+            locatorPanel.classList.remove("expanded");
+        } else {
+            console.debug("[FL Genius Loci] Showing locator panel...");
+            locatorPanel.classList.add("expanded");
         }
     }
 
