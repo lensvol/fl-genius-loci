@@ -38,14 +38,16 @@ window.addEventListener("FL_GL_SettingChanged", (event) => {
     }, () => {});
 });
 
-document.addEventListener("FL_GL_geniusLociInjected", (event) => {
-    chrome.runtime.sendMessage({action: "FL_GL_hello"}, (mapping) => {
-        const settingsEvent = new CustomEvent("FL_GL_setMapping", {
-            detail: {
-                settings: mapping.settings,
-                areas: mapping.areas,
-            }
-        });
-        document.dispatchEvent(settingsEvent);
-    });
+document.addEventListener("FL_GL_geniusLociInjected", () => {
+    chrome.runtime.sendMessage({action: "FL_GL_hello"});
 });
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    const settingsEvent = new CustomEvent("FL_GL_setMapping", {
+        detail: {
+            settings: message.mapping.settings,
+            areas: message.mapping.areas,
+        }
+    });
+    document.dispatchEvent(settingsEvent);
+})

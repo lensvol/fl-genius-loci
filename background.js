@@ -40,7 +40,10 @@ function updateBadgeTooltip() {
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "FL_GL_hello") {
-        externalMapping.then(value => sendResponse(value));
+        externalMapping.then(value => {
+            console.debug(`Sending value mapping to tab ${sender.tab.id}...`);
+            chrome.tabs.sendMessage(sender.tab.id, {mapping: value});
+        });
     }
 
     if (request.action === "FL_GL_setting") {
