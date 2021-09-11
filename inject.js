@@ -1,7 +1,7 @@
 (function () {
     console.log("[FL Genius Loci] Starting injected script.");
 
-    function createButton(icon, title) {
+    function createButton(icon, title, color = "#3f7277") {
         const buttonlet = document.createElement("button");
         buttonlet.setAttribute("type", "button");
         buttonlet.className = "buttonlet-container";
@@ -9,8 +9,7 @@
         const outerSpan = document.createElement("span");
         outerSpan.classList.add("buttonlet", "fa-stack", "fa-lg", "buttonlet-enabled");
         outerSpan.setAttribute("title", title);
-        outerSpan.style.cssText = "color: #ada086";
-
+        outerSpan.style.cssText = `color: ${color}`;
         [
             ["fa", "fa-circle", "fa-stack-2x"],
             ["fa", "fa-inverse", "fa-stack-1x", `fa-${icon}`],
@@ -75,7 +74,24 @@
         return {locatorPanel: stripeDiv, settingDisplay: settingText, areaDisplay: areaText, trackDisplay: trackText};
     }
 
+    const locatorButton = createButton("music", "Toggle locator panel", "#ada086");
+    const muteButton = createButton("volume-up", "Mute", "#ada086")
     const {locatorPanel, settingDisplay, areaDisplay, trackDisplay} = createLocatorPanel();
+    let isMuted = false;
+
+    function updateMuteButton() {
+        const buttonlet = muteButton.querySelector("span[class*='buttonlet']");
+        const icon = muteButton.querySelector("span[class*='fa-inverse']");
+        buttonlet.setAttribute("title", isMuted ? "Unmute" : "Mute");
+
+        if (isMuted) {
+            icon.classList.remove("fa-volume-up");
+            icon.classList.add("fa-volume-off");
+        } else {
+            icon.classList.remove("fa-volume-off");
+            icon.classList.add("fa-volume-up");
+        }
+    }
 
     function updateLocatorArea(name, areaId) {
         areaDisplay.innerText = `${name} (ID: ${areaId})`;
@@ -85,8 +101,8 @@
         settingDisplay.innerText = `${setting} (ID: ${settingId})`;
     }
 
-    function updateLocatorTrack(trackPath) {
-        settingDisplay.innerText = `${trackPath})`;
+    function updateLocatorTrack(track) {
+        trackDisplay.innerText = track;
     }
 
     function toggleLocatorPanel() {
@@ -279,9 +295,9 @@
                         console.debug("[FL Genius Loci] Top stripe found!");
                         const locatorButtonDiv = document.createElement("div");
                         locatorButtonDiv.style.cssText = "display: flex; align-items: flex-end;";
-                        const locatorButton = createButton("music", "Toggle locator panel");
                         locatorButton.addEventListener("click", (event) => toggleLocatorPanel());
                         locatorButtonDiv.appendChild(locatorButton);
+                        locatorButtonDiv.appendChild(muteButton);
 
                         console.debug("[FL Genius Loci] Inserting button...");
                         topStripe.insertBefore(locatorButtonDiv, topStripe.firstChild.nextSibling);
@@ -296,6 +312,9 @@
         }
     });
 
+    muteButton.addEventListener("click", () => {
+        document.dispatchEvent(new CustomEvent("FL_GL_toggleMute"));
+    })
     buttonInsertObserver.observe(document, {childList: true, subtree: true});
 
     document.addEventListener("FL_GL_setMapping", (event) => {
@@ -308,7 +327,12 @@
     });
 
     document.addEventListener("FL_GL_track", (event) => {
-        trackDisplay.innerText = event.detail.message;
+        updateLocatorTrack(event.detail.message);
+    });
+
+    document.addEventListener("FL_GL_muteStatus", (event) => {
+        isMuted = event.detail.isMuted;
+        updateMuteButton();
     });
 
     document.dispatchEvent(new CustomEvent("FL_GL_geniusLociInjected"));

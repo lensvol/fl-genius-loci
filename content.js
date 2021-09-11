@@ -42,12 +42,25 @@ document.addEventListener("FL_GL_geniusLociInjected", () => {
     chrome.runtime.sendMessage({action: "FL_GL_hello"});
 });
 
+document.addEventListener("FL_GL_toggleMute", () => {
+    chrome.runtime.sendMessage({action: "FL_GL_toggleMute"});
+});
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    const settingsEvent = new CustomEvent("FL_GL_setMapping", {
-        detail: {
-            settings: message.mapping.settings,
-            areas: message.mapping.areas,
-        }
-    });
-    document.dispatchEvent(settingsEvent);
+    if (message.action === "setMapping") {
+        const settingsEvent = new CustomEvent("FL_GL_setMapping", {
+            detail: {
+                settings: message.mapping.settings,
+                areas: message.mapping.areas,
+            }
+        });
+        document.dispatchEvent(settingsEvent);
+    } else if (message.action === "muteStatus") {
+        const settingsEvent = new CustomEvent("FL_GL_muteStatus", {
+            detail: {
+                isMuted: message.isMuted,
+            }
+        });
+        document.dispatchEvent(settingsEvent);
+    }
 })

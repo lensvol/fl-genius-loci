@@ -3,6 +3,7 @@ let currentSetting = null;
 let currentLocation = null;
 let currentTrackUrl = "";
 let isMuted = false;
+let flTabs = [];
 
 const externalMapping = new Promise((resolve, reject) => {
     const mappingURL = chrome.runtime.getURL("mappings.json");
@@ -38,12 +39,37 @@ function updateBadgeTooltip() {
     chrome.browserAction.setTitle({"title": `Setting: ${currentSetting}\nLocation: ${currentLocation}`}, () => {});
 }
 
+function toggleMute() {
+    if (isMuted) {
+        isMuted = false;
+        if (currentAudio.currentSrc !== "") {
+            currentAudio.play();
+        }
+    } else {
+        isMuted = true;
+        currentAudio.pause();
+    }
+    chrome.browserAction.setBadgeText({text: isMuted ? "MUTE" : "" }, () => {});
+    chrome.browserAction.setBadgeBackgroundColor({color: isMuted ? "#ff0000" : "#0000ff"});
+
+    flTabs.map((tabId) => chrome.tabs.sendMessage(tabId, {action: "muteStatus", isMuted: isMuted}));
+}
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "FL_GL_hello") {
+        if (!flTabs.includes(sender.tab.id)) {
+            flTabs.push(sender.tab.id);
+        }
+
+        chrome.tabs.sendMessage(sender.tab.id, {action: "muteStatus", isMuted: isMuted});
         externalMapping.then(value => {
             console.debug(`Sending value mapping to tab ${sender.tab.id}...`);
-            chrome.tabs.sendMessage(sender.tab.id, {mapping: value});
+            chrome.tabs.sendMessage(sender.tab.id, {action: "setMapping", mapping: value});
         });
+    }
+
+    if (request.action === "FL_GL_toggleMute") {
+        toggleMute();
     }
 
     if (request.action === "FL_GL_setting") {
@@ -89,18 +115,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
 });
 
-chrome.browserAction.onClicked.addListener((tab) => {
-    if (isMuted) {
-        isMuted = false;
-        if (currentAudio.currentSrc !== "") {
-            currentAudio.play();
-        }
-    } else {
-        isMuted = true;
-        currentAudio.pause();
+chrome.tabs.onRemoved.addListener((tabId, removeInfo) => {
+    const index = flTabs.indexOf(tabId);
+    if (index !== -1) {
+        flTabs.splice(index, 1);
     }
-    chrome.browserAction.setBadgeText({text: isMuted ? "MUTE" : "" }, () => {});
-    chrome.browserAction.setBadgeBackgroundColor({color: isMuted ? "#ff0000" : "#0000ff"});
+});
+
+chrome.browserAction.onClicked.addListener((tab) => {
+    toggleMute();
 });
 
 chrome.browserAction.setBadgeText({text: isMuted ? "MUTE" : "" }, () => {});
