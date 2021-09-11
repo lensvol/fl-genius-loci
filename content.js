@@ -1,4 +1,4 @@
-console.log("Content script started.");
+console.log("[FL Genius Loci] Content script started.");
 
 const s = document.createElement('script');
 s.src = chrome.runtime.getURL('inject.js');
@@ -14,9 +14,9 @@ window.addEventListener("FL_GL_LocationChanged", (event) => {
     }, (response) => {
         let message = "None assigned";
         if (response.track === null) {
-            console.debug("No track should be playing at the moment.");
+            console.debug("[FL Genius Loci] No track should be playing at the moment.");
         } else if (response.track === undefined) {
-            console.debug("Trying to determine right track...");
+            console.debug("[FL Genius Loci] Trying to determine right track...");
             message = "Detecting...";
         } else {
             console.debug(`Playing: ${response.track}`);

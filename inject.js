@@ -1,5 +1,5 @@
 (function () {
-    console.log("Starting injected script for 'FL Genius Loci'.");
+    console.log("[FL Genius Loci] Starting injected script.");
 
     function createButton(icon, title) {
         const buttonlet = document.createElement("button");
@@ -91,10 +91,10 @@
 
     function toggleLocatorPanel() {
         if (locatorPanel.classList.contains("u-visually-hidden")) {
-            console.debug("Showing locator panel...");
+            console.debug("[FL Genius Loci] Showing locator panel...");
             locatorPanel.classList.remove("u-visually-hidden");
         } else {
-            console.debug("Hiding locator panel...");
+            console.debug("[FL Genius Loci] Hiding locator panel...");
             locatorPanel.classList.add("u-visually-hidden");
         }
     }
@@ -109,7 +109,7 @@
     let currentArea = "UNKNOWN";
 
     async function getAreaFromUserInfo() {
-        console.debug("Trying to fetch user info from server...");
+        console.debug("[FL Genius Loci] Trying to fetch user info from server...");
         const response = await fetch(
             "https://api.fallenlondon.com/api/login/user",
             {
@@ -156,7 +156,7 @@
 
             let data = JSON.parse(response.target.responseText);
             if (targetUrl.includes("/api/map") && !data.isSuccess) {
-                console.log("Map cannot be accessed, detecting through user info...")
+                console.log("[FL Genius Loci] Map cannot be accessed, detecting through user info...")
 
                 getAreaFromUserInfo()
                     .then(area => {
@@ -165,7 +165,7 @@
                             currentArea = AREA_IDS_TO_LOCATION[area.id];
                             notifyLocationChanged(currentArea);
                         } else {
-                            console.log("User location is unknown, falling back to setting.");
+                            console.log("[FL Genius Loci] User location is unknown, falling back to setting.");
                             notifyLocationChanged("UNKNOWN");
                         }
                     })
@@ -256,7 +256,7 @@
         return function (name, value) {
             if (name === "Authorization" && value !== authToken) {
                 authToken = value;
-                console.debug("Got FL auth token!");
+                console.debug("[FL Genius Loci] Got FL auth token!");
             }
             return original_function.apply(this, arguments);
         }
@@ -273,22 +273,22 @@
                     const topStripe = node.querySelector("div[class='top-stripe__inner-container']");
 
                     if (topStripe) {
-                        console.debug("Disconnecting observer.")
+                        console.debug("[FL Genius Loci] Disconnecting observer.")
                         observer.disconnect();
 
-                        console.debug("Top stripe found!");
+                        console.debug("[FL Genius Loci] Top stripe found!");
                         const locatorButtonDiv = document.createElement("div");
                         locatorButtonDiv.style.cssText = "display: flex; align-items: flex-end;";
                         const locatorButton = createButton("music", "Toggle locator panel");
                         locatorButton.addEventListener("click", (event) => toggleLocatorPanel());
                         locatorButtonDiv.appendChild(locatorButton);
 
-                        console.debug("Inserting button...");
+                        console.debug("[FL Genius Loci] Inserting button...");
                         topStripe.insertBefore(locatorButtonDiv, topStripe.firstChild.nextSibling);
 
                         topStripe.parentElement.parentElement.insertBefore(locatorPanel, topStripe.parentElement.nextSibling);
 
-                        console.debug("Reconnecting observer.")
+                        console.debug("[FL Genius Loci] Reconnecting observer.")
                         observer.observe(document, {childList: true, subtree: true});
                     }
                 }
@@ -302,7 +302,7 @@
         SETTING_IDS_TO_LOCATION = event.detail.settings;
         AREA_IDS_TO_LOCATION = event.detail.areas;
 
-        console.debug("Mappings received, setting up API interceptors...")
+        console.debug("[FL Genius Loci] Mappings received, setting up API interceptors...")
         XMLHttpRequest.prototype.open = openBypass(XMLHttpRequest.prototype.open);
         XMLHttpRequest.prototype.setRequestHeader = installAuthSniffer(XMLHttpRequest.prototype.setRequestHeader);
     });
