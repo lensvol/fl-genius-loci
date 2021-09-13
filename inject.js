@@ -319,22 +319,24 @@
     })
     buttonInsertObserver.observe(document, {childList: true, subtree: true});
 
-    document.addEventListener("FL_GL_setMapping", (event) => {
-        SETTING_IDS_TO_LOCATION = event.detail.settings;
-        AREA_IDS_TO_LOCATION = event.detail.areas;
+    window.addEventListener("message", (event) => {
+        if(event.data.action === "FL_GL_track") {
+            updateLocatorTrack(event.data.message);
+        }
+        
+        if (event.data.action === "FL_GL_muteStatus") {
+            isMuted = event.data.isMuted;
+            updateMuteButton();
+        }
+        
+        if (event.data.action === "FL_GL_setMapping") {
+            SETTING_IDS_TO_LOCATION = event.data.settings;
+            AREA_IDS_TO_LOCATION = event.data.areas;
 
-        console.debug("[FL Genius Loci] Mappings received, setting up API interceptors...")
-        XMLHttpRequest.prototype.open = openBypass(XMLHttpRequest.prototype.open);
-        XMLHttpRequest.prototype.setRequestHeader = installAuthSniffer(XMLHttpRequest.prototype.setRequestHeader);
-    });
-
-    document.addEventListener("FL_GL_track", (event) => {
-        updateLocatorTrack(event.detail.message);
-    });
-
-    document.addEventListener("FL_GL_muteStatus", (event) => {
-        isMuted = event.detail.isMuted;
-        updateMuteButton();
+            console.debug("[FL Genius Loci] Mappings received, setting up API interceptors...")
+            XMLHttpRequest.prototype.open = openBypass(XMLHttpRequest.prototype.open);
+            XMLHttpRequest.prototype.setRequestHeader = installAuthSniffer(XMLHttpRequest.prototype.setRequestHeader);
+        }
     });
 
     document.dispatchEvent(new CustomEvent("FL_GL_geniusLociInjected"));

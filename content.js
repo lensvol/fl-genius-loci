@@ -7,11 +7,23 @@ s.onload = function () {
 };
 (document.head || document.documentElement).appendChild(s);
 
+function sendToPage(action, detail) {
+    window.postMessage({
+        action: action,
+        ...detail
+    }, "https://www.fallenlondon.com");
+}
+
 window.addEventListener("FL_GL_LocationChanged", (event) => {
     chrome.runtime.sendMessage({
         action: "FL_GL_location",
         location: event.detail.location,
     }, (response) => {
+        if (response === undefined) {
+            // FIXME: What is this even
+            return;
+        }
+
         let message = "None assigned";
         if (response.track === null) {
             console.debug("[FL Genius Loci] No track should be playing at the moment.");
@@ -22,12 +34,7 @@ window.addEventListener("FL_GL_LocationChanged", (event) => {
             console.debug(`[FL Genius Loci] Playing: ${response.track}`);
             message = response.track.replace("tracks/", "");
         }
-        const settingsEvent = new CustomEvent("FL_GL_track", {
-            detail: {
-                message: message,
-            }
-        });
-        document.dispatchEvent(settingsEvent);
+        sendToPage("FL_GL_track", {message: message});
     });
 });
 
@@ -48,19 +55,13 @@ document.addEventListener("FL_GL_toggleMute", () => {
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === "setMapping") {
-        const settingsEvent = new CustomEvent("FL_GL_setMapping", {
-            detail: {
-                settings: message.mapping.settings,
-                areas: message.mapping.areas,
-            }
+        sendToPage("FL_GL_setMapping", {
+            settings: message.mapping.settings,
+            areas: message.mapping.areas,
         });
-        document.dispatchEvent(settingsEvent);
     } else if (message.action === "muteStatus") {
-        const settingsEvent = new CustomEvent("FL_GL_muteStatus", {
-            detail: {
-                isMuted: message.isMuted,
-            }
+        sendToPage("FL_GL_muteStatus", {
+            isMuted: message.isMuted,
         });
-        document.dispatchEvent(settingsEvent);
     }
 })
