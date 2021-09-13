@@ -1,4 +1,6 @@
 (function () {
+    const UNKNOWN = "UNKNOWN";
+
     console.log("[FL Genius Loci] Starting injected script.");
 
     function createButton(icon, title, color = "#3f7277") {
@@ -119,10 +121,10 @@
 
     let authToken = "";
     let SETTING_IDS_TO_LOCATION = {};
-    let currentSetting = "UNKNOWN";
+    let currentSetting = UNKNOWN;
 
     let AREA_IDS_TO_LOCATION = {}
-    let currentArea = "UNKNOWN";
+    let currentArea = UNKNOWN;
 
     async function getAreaFromUserInfo() {
         console.debug("[FL Genius Loci] Trying to fetch user info from server...");
@@ -183,8 +185,10 @@
                             updateLocatorArea(currentArea, area.id);
                         } else {
                             console.log("[FL Genius Loci] User location is unknown, falling back to setting.");
-                            notifyLocationChanged("UNKNOWN");
-                            updateLocatorArea("Unknown", "???");
+                            notifyLocationChanged(UNKNOWN);
+                            currentArea = UNKNOWN;
+                            // While that specific location may not be known to _us_, it does in fact has name and ID
+                            updateLocatorArea(area.name, area.id);
                         }
                     })
 
@@ -223,15 +227,15 @@
                 }
             }
 
-            let newSetting = "UNKNOWN";
-            let newArea = "UNKNOWN";
+            let newSetting = UNKNOWN;
+            let newArea = UNKNOWN;
 
             if (settingId in SETTING_IDS_TO_LOCATION) {
                 if (currentSetting !== SETTING_IDS_TO_LOCATION[settingId]) {
                     currentSetting = newSetting = SETTING_IDS_TO_LOCATION[settingId];
                 }
             } else {
-                newSetting = "UNKNOWN";
+                newSetting = UNKNOWN;
             }
 
             if (areaId in AREA_IDS_TO_LOCATION) {
@@ -239,14 +243,14 @@
                     currentArea = newArea = AREA_IDS_TO_LOCATION[areaId];
                 }
             } else {
-                newArea = "UNKNOWN";
+                newArea = UNKNOWN;
             }
 
-            if (newSetting !== "UNKNOWN") {
+            if (newSetting !== UNKNOWN) {
                 updateLocatorSetting(newSetting, settingId);
                 notifySettingChanged(newSetting);
             }
-            if (newArea !== "UNKNOWN") {
+            if (newArea !== UNKNOWN) {
                 updateLocatorArea(newArea, areaId);
                 notifyLocationChanged(newArea);
             }
