@@ -86,7 +86,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
         findTrackForLocation(currentSetting, location)
             .then(trackPath => {
-                sendResponse({track: trackPath});
+                flTabs.map((tabId) => chrome.tabs.sendMessage(tabId, {action: "track", track: trackPath}));
                 return trackPath;
             })
             .then(trackPath => chrome.runtime.getURL("tracks/" + trackPath))

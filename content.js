@@ -18,23 +18,6 @@ window.addEventListener("FL_GL_LocationChanged", (event) => {
     chrome.runtime.sendMessage({
         action: "FL_GL_location",
         location: event.detail.location,
-    }, (response) => {
-        if (response === undefined) {
-            // FIXME: What is this even
-            return;
-        }
-
-        let message = "None assigned";
-        if (response.track === null) {
-            console.debug("[FL Genius Loci] No track should be playing at the moment.");
-        } else if (response.track === undefined) {
-            console.debug("[FL Genius Loci] Trying to determine right track...");
-            message = "Detecting...";
-        } else {
-            console.debug(`[FL Genius Loci] Playing: ${response.track}`);
-            message = response.track.replace("tracks/", "");
-        }
-        sendToPage("FL_GL_track", {message: message});
     });
 });
 
@@ -62,6 +45,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     } else if (message.action === "muteStatus") {
         sendToPage("FL_GL_muteStatus", {
             isMuted: message.isMuted,
+        });
+    } else if (message.action === "track") {
+        sendToPage("FL_GL_track", {
+            track: message.track.replace("tracks/", ""),
         });
     }
 })

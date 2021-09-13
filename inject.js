@@ -325,7 +325,7 @@
 
     window.addEventListener("message", (event) => {
         if(event.data.action === "FL_GL_track") {
-            updateLocatorTrack(event.data.message);
+            updateLocatorTrack(event.data.track);
         }
         
         if (event.data.action === "FL_GL_muteStatus") {
