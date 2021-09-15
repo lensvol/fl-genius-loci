@@ -94,6 +94,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 if (currentTrackUrl !== trackUrl) {
                     console.log(`Playing track ${trackUrl}`)
 
+                    currentTrackUrl = trackUrl;
                     currentAudio.pause();
                     currentAudio.loop = true;
                     currentAudio.src = trackUrl;
