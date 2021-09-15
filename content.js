@@ -48,7 +48,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         });
     } else if (message.action === "track") {
         sendToPage("FL_GL_track", {
-            track: message.track.replace("tracks/", ""),
+            track: (message.track || "None assigned").replace("tracks/", ""),
         });
     }
 })

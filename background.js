@@ -111,7 +111,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 currentAudio.pause();
                 currentAudio.src = "";
 
-                sendResponse({track: null});
+                flTabs.map((tabId) => chrome.tabs.sendMessage(tabId, {action: "track", track: null}));
             })
     }
 });
