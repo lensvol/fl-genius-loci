@@ -121,6 +121,11 @@ chrome.tabs.onRemoved.addListener((tabId, removeInfo) => {
     if (index !== -1) {
         flTabs.splice(index, 1);
     }
+
+    if (flTabs.length === 0) {
+        currentAudio.pause();
+        currentAudio.src = "";
+    }
 });
 
 chrome.tabs.query(
