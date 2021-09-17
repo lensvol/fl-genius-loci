@@ -301,7 +301,6 @@
                         console.debug("[FL Genius Loci] Top stripe found!");
                         const locatorButtonDiv = document.createElement("div");
                         locatorButtonDiv.style.cssText = "display: flex; align-items: flex-end;";
-                        locatorButton.addEventListener("click", (event) => toggleLocatorPanel());
                         locatorButtonDiv.appendChild(locatorButton);
                         locatorButtonDiv.appendChild(muteButton);
 
@@ -318,6 +317,7 @@
         }
     });
 
+    locatorButton.addEventListener("click", () => toggleLocatorPanel());
     muteButton.addEventListener("click", () => {
         document.dispatchEvent(new CustomEvent("FL_GL_toggleMute"));
     })
