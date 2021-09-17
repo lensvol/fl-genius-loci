@@ -62,6 +62,9 @@ in the directory where you unzipped the extension.
 * Add customization guide
 * Settings page
 
+## Attribution
+This extensions icon is by [Paomedia](https://www.iconfinder.com/paomedia) and is used under [Creative Commons Attribution 3.0 Unported](http://creativecommons.org/licenses/by/3.0/) license.
+
 ## Special thanks
 * Saltlord, a scorn fluke - for early testing and support for the idea.
 * [Alan Huang](https://github.com/alanhuang122) - for providing the list of area IDs inside FL app.
