@@ -68,3 +68,4 @@ This extensions icon is by [Paomedia](https://www.iconfinder.com/paomedia) and i
 ## Special thanks
 * Saltlord, a scorn fluke - for early testing and support for the idea.
 * [Alan Huang](https://github.com/alanhuang122) - for providing the list of area IDs inside FL app.
+* [Arkuzian](https://www.reddit.com/user/Arkuzian/) - for helping to debug issues with the background script.
