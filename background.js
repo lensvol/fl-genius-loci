@@ -6,16 +6,28 @@ let isMuted = false;
 let flTabs = [];
 
 const externalMapping = new Promise((resolve, reject) => {
-    const mappingURL = chrome.runtime.getURL("mappings.json");
+    chrome.runtime.getPackageDirectoryEntry((storageRoot) => {
+        storageRoot.getFile("mappings.json", {}, (fileEntry) => {
+            fileEntry.file((f) => {
+                const reader = new FileReader();
 
-    fetch(mappingURL)
-        .then(response => response.json())
-        .then(mappings_json => resolve(mappings_json))
-        .catch((reason) => {
-            console.error(`Could not load mappings.json: ${reason}`);
-            // We should not error out if we cannot load the mapping
-            resolve({tracks: {}, settings: {}, areas: {}});
-        })
+                reader.addEventListener("loadend", () => {
+                    console.log("Loaded 'mappings.json'.");
+                    const mappings = JSON.parse(reader.result);
+                    if (mappings.tracks === undefined || mappings.settings === undefined || mappings.areas === undefined) {
+                        console.error("Malformed 'mappings.json': Keys 'tracks', 'settings' and 'areas' should be present.");
+                        resolve({tracks: {}, settings: {}, areas: {}});
+                    }
+
+                    resolve(mappings);
+                });
+
+                reader.readAsText(f);
+            });
+        }, (exc) => {
+            console.error(exc);
+        });
+    });
 })
 
 function findTrackForLocation(setting, location) {
