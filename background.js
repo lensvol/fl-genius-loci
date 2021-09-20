@@ -5,6 +5,35 @@ let currentTrackUrl = "";
 let isMuted = false;
 let flTabs = [];
 
+function checkFileExists(path) {
+    return new Promise((resolve, reject) => {
+        chrome.runtime.getPackageDirectoryEntry((storageRoot) => {
+            storageRoot.getFile(
+                path,
+                {create: false},
+                () => resolve({path: path, exists: true}),
+                () => resolve({path: path, exists: false})
+            )
+        });
+    });
+}
+
+async function verifyLocationTracks(tracksMapping) {
+    const locationsMissingTrack = [];
+    for (const location in tracksMapping) {
+        if (!tracksMapping[location]) {
+            continue;
+        }
+
+        const result = await checkFileExists(`tracks/${tracksMapping[location]}`);
+        if (!result.exists) {
+            locationsMissingTrack.push(location);
+        }
+    }
+
+    return locationsMissingTrack;
+}
+
 const externalMapping = new Promise((resolve, reject) => {
     chrome.runtime.getPackageDirectoryEntry((storageRoot) => {
         storageRoot.getFile("mappings.json", {}, (fileEntry) => {
@@ -19,8 +48,18 @@ const externalMapping = new Promise((resolve, reject) => {
                         resolve({tracks: {}, settings: {}, areas: {}});
                     }
 
-                    resolve(mappings);
-                });
+                    verifyLocationTracks(mappings.tracks)
+                        .then((locationsWithoutTracks) => {
+                            locationsWithoutTracks.forEach((location) => {
+                                console.error(`Location "${location}" is missing track: ${mappings.tracks[location]}`);
+                                // Prevent attempts to play missing tracks
+                                mappings.tracks[location] = "";
+                            })
+
+                            resolve(mappings);
+                        });
+                    }
+                );
 
                 reader.readAsText(f);
             });
