@@ -76,7 +76,7 @@ function findTrackForLocation(setting, location) {
                 if (location in mapping.tracks && mapping.tracks[location] !== "") {
                     console.debug(`[FL Genius Loci] Selecting track ${mapping.tracks[location]} for "${location} (${currentSetting})"`);
                     resolve(mapping.tracks[location])
-                } else if (currentSetting in mapping && mapping.tracks[currentSetting] !== "") {
+                } else if (currentSetting in mapping.tracks && mapping.tracks[currentSetting] !== "") {
                     console.debug(`[FL Genius Loci] Location unknown, selecting track ${mapping.tracks[currentSetting]} for setting "${currentSetting}"`);
                     resolve(mapping.tracks[currentSetting])
                 }
@@ -125,6 +125,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
 
     if (request.action === "FL_GL_setting") {
+        console.debug(`[FL Genius Loci] Set setting to "${request.setting}"`);
         currentSetting = request.setting;
         updateBadgeTooltip();
         sendResponse({});

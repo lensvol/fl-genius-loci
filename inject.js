@@ -250,9 +250,12 @@
                 updateLocatorSetting(newSetting, settingId);
                 notifySettingChanged(newSetting);
             }
+
             if (newArea !== UNKNOWN) {
                 updateLocatorArea(newArea, areaId);
                 notifyLocationChanged(newArea);
+            } else {
+                notifyLocationChanged(UNKNOWN);
             }
         }
     }
