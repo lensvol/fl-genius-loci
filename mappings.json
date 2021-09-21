@@ -45,6 +45,7 @@
         "Mirror-Marches": "Maribeth Solomon and Brent Barkman - Fallen London OST - 18 Irrigo Below.mp3",
         "Winking Isle": "Maribeth Solomon and Brent Barkman - Fallen London OST - 18 Irrigo Below.mp3",
         "Flute Street": "Maribeth Solomon and Brent Barkman - Fallen London OST - 19 Something of a Fluke.mp3",
+        "Bone Market": "Maribeth Solomon and Brent Barkman - Fallen London OST - 20 The Department of Menace Eradication.mp3",
         "Dept. of Menace Eradication": "Maribeth Solomon and Brent Barkman - Fallen London OST - 20 The Department of Menace Eradication.mp3",
         "Watchmaker's Hill": "Maribeth Solomon and Brent Barkman - Fallen London OST - 20 The Department of Menace Eradication.mp3",
         "A Dark Place": "",
@@ -60,7 +61,6 @@
         "Base Camp": "",
         "Beneath the Palace": "",
         "Blind Helmsman": "",
-        "Bone Market": "",
         "Broad Unterzee": "",
         "Bullbone Island": "",
         "Burrow-Infra-Mump": "",
@@ -112,6 +112,25 @@
         "Venderbright": "",
         "Working with the Clay Highwayman": "",
         "Your Lodgings": ""
+    },
+    "settings": {
+        "2": "Fifth City",
+        "3": "Insanity",
+        "4": "Death",
+        "10": "Parabola",
+        "16": "Southern Archipelago",
+        "19": "An Elaborate Party",
+        "104028": "Port Carnelian",
+        "104684": "Elder Continent",
+        "106005": "Laboratory",
+        "107941": "Upper River",
+        "107950": "Under Parabolan Ice",
+        "107951": "Aboard, at Port",
+        "107952": "Zailing the Unterzee",
+        "107954": "Working with the Clay Highwayman",
+        "107955": "Khanate (Inner)",
+        "107957": "An Exceptional Library",
+        "107959": "Khanate (Copper Quarter)"
     },
     "areas": {
         "1": "New Newgate",
@@ -207,24 +226,5 @@
         "111187": "Snares",
         "111194": "Copper Quarter",
         "111195": "An Exceptional Library"
-    },
-    "settings": {
-        "2": "Fifth City",
-        "3": "Insanity",
-        "4": "Death",
-        "10": "Parabola",
-        "16": "Southern Archipelago",
-        "19": "An Elaborate Party",
-        "104028": "Port Carnelian",
-        "104684": "Elder Continent",
-        "106005": "Laboratory",
-        "107941": "Upper River",
-        "107950": "Under Parabolan Ice",
-        "107951": "Aboard, at Port",
-        "107952": "Zailing the Unterzee",
-        "107954": "Working with the Clay Highwayman",
-        "107955": "Khanate (Inner)",
-        "107957": "An Exceptional Library",
-        "107959": "Khanate (Copper Quarter)"
     }
 }
