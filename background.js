@@ -1,3 +1,5 @@
+const UNKNOWN = "UNKNOWN";
+
 let currentAudio = new Audio();
 let currentSetting = null;
 let currentLocation = null;
@@ -136,36 +138,41 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         currentLocation = location;
         updateBadgeTooltip();
 
-        findTrackForLocation(currentSetting, location)
-            .then(trackPath => {
-                flTabs.map((tabId) => chrome.tabs.sendMessage(tabId, {action: "track", track: trackPath}));
-                return trackPath;
-            })
-            .then(trackPath => chrome.runtime.getURL("tracks/" + trackPath))
-            .then(trackUrl => {
-                if (currentTrackUrl !== trackUrl) {
-                    console.log(`Playing track ${trackUrl}`)
+        console.debug(`[FL Genius Loci] Find track for "${request.location}"`);
 
-                    currentTrackUrl = trackUrl;
-                    currentAudio.pause();
-                    currentAudio.loop = true;
-                    currentAudio.src = trackUrl;
+        // Doesn't make sense to search for a track that we definitely will not find
+        if (location !== UNKNOWN) {
+            findTrackForLocation(currentSetting, location)
+                .then(trackPath => {
+                    flTabs.map((tabId) => chrome.tabs.sendMessage(tabId, {action: "track", track: trackPath}));
+                    return trackPath;
+                })
+                .then(trackPath => chrome.runtime.getURL("tracks/" + trackPath))
+                .then(trackUrl => {
+                    if (currentTrackUrl !== trackUrl) {
+                        console.log(`Playing track ${trackUrl}`)
 
-                    if (!isMuted) {
-                        currentAudio.play();
+                        currentTrackUrl = trackUrl;
+                        currentAudio.pause();
+                        currentAudio.loop = true;
+                        currentAudio.src = trackUrl;
+
+                        if (!isMuted) {
+                            currentAudio.play();
+                        }
+                    } else {
+                        console.log("It is the same track as before!");
                     }
-                } else {
-                    console.log("It is the same track as before!");
-                }
-            })
-            .catch((error) => {
-                console.log(`Something went wrong: ${error}`);
+                })
+                .catch((error) => {
+                    console.log(`Something went wrong: ${error}`);
 
-                currentAudio.pause();
-                currentAudio.src = "";
+                    currentAudio.pause();
+                    currentAudio.src = "";
 
-                flTabs.map((tabId) => chrome.tabs.sendMessage(tabId, {action: "track", track: null}));
-            })
+                    flTabs.map((tabId) => chrome.tabs.sendMessage(tabId, {action: "track", track: null}));
+                })
+        }
     }
 });
 
@@ -178,6 +185,11 @@ chrome.tabs.onRemoved.addListener((tabId, removeInfo) => {
     if (flTabs.length === 0) {
         currentAudio.pause();
         currentAudio.src = "";
+        currentTrackUrl = "";
+        currentSetting = "";
+        currentLocation = "";
+
+        updateBadgeTooltip();
     }
 });
 
