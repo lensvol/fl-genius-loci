@@ -8,6 +8,7 @@
         "Science Laboratory": "Maribeth Solomon and Brent Barkman - Fallen London OST - 02 An Embassy Waltz.mp3",
         "Temple Club": "Maribeth Solomon and Brent Barkman - Fallen London OST - 02 An Embassy Waltz.mp3",
         "University": "Maribeth Solomon and Brent Barkman - Fallen London OST - 02 An Embassy Waltz.mp3",
+        "Base Camp": "Maribeth Solomon and Brent Barkman - Fallen London OST - 03 Labyrinth of Tigers.mp3",
         "Forgotten Quarter": "Maribeth Solomon and Brent Barkman - Fallen London OST - 03 Labyrinth of Tigers.mp3",
         "Labyrinth of Tigers": "Maribeth Solomon and Brent Barkman - Fallen London OST - 03 Labyrinth of Tigers.mp3",
         "House of Chimes": "Maribeth Solomon and Brent Barkman - Fallen London OST - 04 House of Chimes.mp3",
@@ -58,7 +59,6 @@
         "Adulterine Castle": "",
         "An Exceptional Library": "",
         "Balmoral": "",
-        "Base Camp": "",
         "Beneath the Palace": "",
         "Blind Helmsman": "",
         "Broad Unterzee": "",
@@ -111,7 +111,8 @@
         "VERY LITTLE SCREAMING": "",
         "Venderbright": "",
         "Working with the Clay Highwayman": "",
-        "Your Lodgings": ""
+        "Your Lodgings": "",
+        "Reflection of your Laboratory": ""
     },
     "areas": {
         "1": "New Newgate",
@@ -173,11 +174,11 @@
         "105438": "Heartscross House",
         "109643": "Tanah-Chook",
         "110041": "Court of the Wakeful Eye",
-        "111070": "Reflection of your Laboratory",
         "110082": "Medusa's Head",
         "111064": "Clay Quarters",
         "111065": "Moloch Street",
         "111066": "Concord Square",
+        "111070": "Reflection of your Laboratory",
         "111072": "Dept. of Menace Eradication",
         "111073": "Singing Mandrake",
         "111079": "Base Camp",
