@@ -4,7 +4,7 @@ const trackPlayer = new TrackPlayer();
 
 let currentSetting = null;
 let currentLocation = null;
-let currentTrackUrl = "";
+let currentTrackPath = "";
 let isMuted = false;
 let flTabs = [];
 
@@ -157,16 +157,20 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                     return trackPath;
                 })
                 .then(trackPath => {
-                    if (currentTrackUrl !== trackPath) {
+                    if (currentTrackPath !== trackPath) {
                         console.log(`Playing track ${trackPath}`)
 
                         trackPlayer.playTrack(trackPath);
+
+                        currentTrackPath = trackPath;
                     } else {
                         console.log("It is the same track as before!");
                     }
                 })
                 .catch((error) => {
                     console.log(`Something went wrong: ${error}`);
+
+                    trackPlayer.stop();
 
                     flTabs.map((tabId) => chrome.tabs.sendMessage(tabId, {action: "track", track: null}));
                 })
@@ -191,3 +195,6 @@ chrome.tabs.query(
     {url: "*://*.fallenlondon.com/*"},
     (tabs) => tabs.map((tab) => flTabs.push(tab.id))
 );
+
+externalMapping.then(() => console.debug("[FL Genius Loci] Mappings loaded."));
+externalMapping.then(() => console.debug("[FL Genius Loci] Mappings loaded."));

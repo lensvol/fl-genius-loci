@@ -45,4 +45,10 @@ class TrackPlayer {
     unmute() {
         this.gainNode.gain.value = this.previousGain;
     }
+
+    stop() {
+        if (this.source) {
+            this.source.stop(0);
+        }
+    }
 }
