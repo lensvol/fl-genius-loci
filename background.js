@@ -1,6 +1,7 @@
 const UNKNOWN = "UNKNOWN";
 
-let currentAudio = new Audio();
+const trackPlayer = new TrackPlayer();
+
 let currentSetting = null;
 let currentLocation = null;
 let currentTrackUrl = "";
@@ -52,13 +53,22 @@ const externalMapping = new Promise((resolve, reject) => {
 
                     verifyLocationTracks(mappings.tracks)
                         .then((locationsWithoutTracks) => {
+                            console.debug("Creating set of existing tracks...")
+                            const existingTracks = new Set();
+                            for (const location in mappings.tracks) {
+                                if (mappings.tracks[location]) {
+                                    existingTracks.add(mappings.tracks[location]);
+                                }
+                            }
+
                             locationsWithoutTracks.forEach((location) => {
                                 console.error(`Location "${location}" is missing track: ${mappings.tracks[location]}`);
                                 // Prevent attempts to play missing tracks
+                                existingTracks.delete(mappings.tracks[location]);
                                 mappings.tracks[location] = "";
                             })
 
-                            resolve(mappings);
+                            trackPlayer.loadTracks(existingTracks.values()).then(() => resolve(mappings));
                         });
                     }
                 );
@@ -89,23 +99,22 @@ function findTrackForLocation(setting, location) {
 }
 
 function updateBadgeTooltip() {
+    chrome.browserAction.setBadgeText({text: isMuted ? "MUTE" : ""}, () => {});
+    chrome.browserAction.setBadgeBackgroundColor({color: isMuted ? "#ff0000" : "#0000ff"});
+
     chrome.browserAction.setTitle({"title": `Setting: ${currentSetting}\nLocation: ${currentLocation}`}, () => {});
 }
 
 function toggleMute() {
     if (isMuted) {
         isMuted = false;
-        if (currentAudio.currentSrc !== "") {
-            currentAudio.play();
-        }
+        trackPlayer.unmute();
     } else {
         isMuted = true;
-        currentAudio.pause();
+        trackPlayer.mute();
     }
-    chrome.browserAction.setBadgeText({text: isMuted ? "MUTE" : ""}, () => {
-    });
-    chrome.browserAction.setBadgeBackgroundColor({color: isMuted ? "#ff0000" : "#0000ff"});
 
+    updateBadgeTooltip();
     flTabs.map((tabId) => chrome.tabs.sendMessage(tabId, {action: "muteStatus", isMuted: isMuted}));
 }
 
@@ -147,28 +156,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                     flTabs.map((tabId) => chrome.tabs.sendMessage(tabId, {action: "track", track: trackPath}));
                     return trackPath;
                 })
-                .then(trackPath => chrome.runtime.getURL("tracks/" + trackPath))
-                .then(trackUrl => {
-                    if (currentTrackUrl !== trackUrl) {
-                        console.log(`Playing track ${trackUrl}`)
+                .then(trackPath => {
+                    if (currentTrackUrl !== trackPath) {
+                        console.log(`Playing track ${trackPath}`)
 
-                        currentTrackUrl = trackUrl;
-                        currentAudio.pause();
-                        currentAudio.loop = true;
-                        currentAudio.src = trackUrl;
-
-                        if (!isMuted) {
-                            currentAudio.play();
-                        }
+                        trackPlayer.playTrack(trackPath);
                     } else {
                         console.log("It is the same track as before!");
                     }
                 })
                 .catch((error) => {
                     console.log(`Something went wrong: ${error}`);
-
-                    currentAudio.pause();
-                    currentAudio.src = "";
 
                     flTabs.map((tabId) => chrome.tabs.sendMessage(tabId, {action: "track", track: null}));
                 })
@@ -183,11 +181,7 @@ chrome.tabs.onRemoved.addListener((tabId, removeInfo) => {
     }
 
     if (flTabs.length === 0) {
-        currentAudio.pause();
-        currentAudio.src = "";
-        currentTrackUrl = "";
-        currentSetting = "";
-        currentLocation = "";
+        trackPlayer.mute();
 
         updateBadgeTooltip();
     }

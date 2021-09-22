@@ -5,6 +5,7 @@
   "manifest_version": 2,
   "background": {
     "scripts": [
+      "track_player.js",
       "background.js"
     ],
     "persistent": true
