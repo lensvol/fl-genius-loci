@@ -24,12 +24,13 @@ class TrackPlayer {
         }
     }
 
-    playTrack(track) {
+    playTrack(track, loop = true) {
         if (this.source) {
             this.source.stop(0);
         }
 
         this.source = this.audioCtx.createBufferSource();
+        this.source.loop = loop;
         this.source.buffer = this.buffers[track];
         this.source.connect(this.gainNode);
         this.gainNode.gain.value = 1;
