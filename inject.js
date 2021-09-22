@@ -126,6 +126,11 @@
     let AREA_IDS_TO_LOCATION = {}
     let currentArea = UNKNOWN;
 
+    let areaId = null;
+    let areaName = null;
+    let settingId = null;
+    let settingName = null;
+
     async function getAreaFromUserInfo() {
         console.debug("[FL Genius Loci] Trying to fetch user info from server...");
         const response = await fetch(
@@ -158,14 +163,45 @@
         window.dispatchEvent(event);
     }
 
+    function detectCurrentLocation() {
+        updateLocatorArea(areaId, areaName);
+        updateLocatorSetting(settingId, settingName);
+
+        let newSetting = UNKNOWN;
+        let newArea = UNKNOWN;
+
+        if (settingId in SETTING_IDS_TO_LOCATION) {
+            if (currentSetting !== SETTING_IDS_TO_LOCATION[settingId]) {
+                currentSetting = newSetting = SETTING_IDS_TO_LOCATION[settingId];
+            }
+        } else {
+            newSetting = UNKNOWN;
+        }
+
+        if (areaId in AREA_IDS_TO_LOCATION) {
+            if (currentArea !== AREA_IDS_TO_LOCATION[areaId]) {
+                currentArea = newArea = AREA_IDS_TO_LOCATION[areaId];
+            }
+        } else {
+            newArea = UNKNOWN;
+        }
+
+        if (newSetting !== UNKNOWN) {
+            updateLocatorSetting(newSetting, settingId);
+            notifySettingChanged(newSetting);
+        }
+
+        if (newArea !== UNKNOWN) {
+            updateLocatorArea(newArea, areaId);
+            notifyLocationChanged(newArea);
+        } else {
+            notifyLocationChanged(UNKNOWN);
+        }
+    }
+
     function parseResponse(response) {
         if (this.readyState === DONE) {
             // TODO: Proper URL matching
-            let areaId = null;
-            let areaName = null;
-            let settingId = null;
-            let settingName = null;
-
             let targetUrl = response.currentTarget.responseURL;
 
             if (!((targetUrl.includes("/api/map") || targetUrl.includes("/choosebranch") || targetUrl.includes("/myself")) && targetUrl.includes("fallenlondon"))) {
@@ -183,18 +219,11 @@
 
                     getAreaFromUserInfo()
                         .then(area => {
-                            if (area.id in AREA_IDS_TO_LOCATION) {
-                                console.log(`[FL Genius Loci] User is now at ${area.name} (ID: ${area.id})`);
-                                currentArea = AREA_IDS_TO_LOCATION[area.id];
-                                notifyLocationChanged(currentArea);
-                                updateLocatorArea(currentArea, area.id);
-                            } else {
-                                console.log("[FL Genius Loci] User location is unknown, falling back to setting.");
-                                notifyLocationChanged(UNKNOWN);
-                                currentArea = UNKNOWN;
-                                // While that specific location may not be known to _us_, it does in fact has name and ID
-                                updateLocatorArea(area.name, area.id);
-                            }
+                            console.log(`[FL Genius Loci] User is now at ${area.name} (ID: ${area.id})`);
+                            areaId = area.id;
+                            areaName = area.name;
+
+                            detectCurrentLocation();
                         })
 
                     return;
@@ -229,36 +258,7 @@
                 }
             }
 
-            let newSetting = UNKNOWN;
-            let newArea = UNKNOWN;
-
-            if (settingId in SETTING_IDS_TO_LOCATION) {
-                if (currentSetting !== SETTING_IDS_TO_LOCATION[settingId]) {
-                    currentSetting = newSetting = SETTING_IDS_TO_LOCATION[settingId];
-                }
-            } else {
-                newSetting = UNKNOWN;
-            }
-
-            if (areaId in AREA_IDS_TO_LOCATION) {
-                if (currentArea !== AREA_IDS_TO_LOCATION[areaId]) {
-                    currentArea = newArea = AREA_IDS_TO_LOCATION[areaId];
-                }
-            } else {
-                newArea = UNKNOWN;
-            }
-
-            if (newSetting !== UNKNOWN) {
-                updateLocatorSetting(newSetting, settingId);
-                notifySettingChanged(newSetting);
-            }
-
-            if (newArea !== UNKNOWN) {
-                updateLocatorArea(newArea, areaId);
-                notifyLocationChanged(newArea);
-            } else {
-                notifyLocationChanged(UNKNOWN);
-            }
+            detectCurrentLocation();
         }
     }
 
@@ -342,11 +342,14 @@
             SETTING_IDS_TO_LOCATION = event.data.settings;
             AREA_IDS_TO_LOCATION = event.data.areas;
 
-            console.debug("[FL Genius Loci] Mappings received, setting up API interceptors...")
-            XMLHttpRequest.prototype.open = openBypass(XMLHttpRequest.prototype.open);
-            XMLHttpRequest.prototype.setRequestHeader = installAuthSniffer(XMLHttpRequest.prototype.setRequestHeader);
+            console.debug("[FL Genius Loci] Mappings received, trying to detect current location...");
+            detectCurrentLocation();
         }
     });
+
+    console.debug("[FL Genius Loci] Setting up API interceptors.");
+    XMLHttpRequest.prototype.open = openBypass(XMLHttpRequest.prototype.open);
+    XMLHttpRequest.prototype.setRequestHeader = installAuthSniffer(XMLHttpRequest.prototype.setRequestHeader);
 
     document.dispatchEvent(new CustomEvent("FL_GL_geniusLociInjected"));
 }())
