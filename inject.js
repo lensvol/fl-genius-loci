@@ -173,26 +173,32 @@
             }
 
             let data = JSON.parse(response.target.responseText);
-            if (targetUrl.includes("/api/map") && !data.isSuccess) {
-                console.log("[FL Genius Loci] Map cannot be accessed, detecting through user info...")
+            if (targetUrl.endsWith("/api/map")) {
+                if (data.isSuccess) {
+                    areaId = data["currentArea"].id;
+                    areaName = data["currentArea"].name;
+                    console.log(`[FL Genius Loci] We are at ${data["currentArea"].name} (ID: ${data["currentArea"].id})`);
+                } else if (currentArea === UNKNOWN) {
+                    console.log("[FL Genius Loci] Map cannot be accessed & location unknown, detecting through user info...")
 
-                getAreaFromUserInfo()
-                    .then(area => {
-                        if (area.id in AREA_IDS_TO_LOCATION) {
-                            console.log(`[FL Genius Loci] User is now at ${area.name} (ID: ${area.id})`);
-                            currentArea = AREA_IDS_TO_LOCATION[area.id];
-                            notifyLocationChanged(currentArea);
-                            updateLocatorArea(currentArea, area.id);
-                        } else {
-                            console.log("[FL Genius Loci] User location is unknown, falling back to setting.");
-                            notifyLocationChanged(UNKNOWN);
-                            currentArea = UNKNOWN;
-                            // While that specific location may not be known to _us_, it does in fact has name and ID
-                            updateLocatorArea(area.name, area.id);
-                        }
-                    })
+                    getAreaFromUserInfo()
+                        .then(area => {
+                            if (area.id in AREA_IDS_TO_LOCATION) {
+                                console.log(`[FL Genius Loci] User is now at ${area.name} (ID: ${area.id})`);
+                                currentArea = AREA_IDS_TO_LOCATION[area.id];
+                                notifyLocationChanged(currentArea);
+                                updateLocatorArea(currentArea, area.id);
+                            } else {
+                                console.log("[FL Genius Loci] User location is unknown, falling back to setting.");
+                                notifyLocationChanged(UNKNOWN);
+                                currentArea = UNKNOWN;
+                                // While that specific location may not be known to _us_, it does in fact has name and ID
+                                updateLocatorArea(area.name, area.id);
+                            }
+                        })
 
-                return;
+                    return;
+                }
             }
 
             if (targetUrl.endsWith("/myself")) {
@@ -201,11 +207,7 @@
                 console.log(`[FL Genius Loci] Current setting is ${settingName} (ID: ${settingId})`);
             }
 
-            if (targetUrl.endsWith("/api/map")) {
-                areaId = data["currentArea"].id;
-                areaName = data["currentArea"].name;
-                console.log(`[FL Genius Loci] We are at ${data["currentArea"].name} (ID: ${data["currentArea"].id})`);
-            } else if (targetUrl.endsWith("/api/map/move")) {
+            if (targetUrl.endsWith("/api/map/move")) {
                 areaId = data["area"].id;
                 areaName = data["area"].name;
                 console.log(`[FL Genius Loci] We moved to ${data["area"].name} (ID: ${data["area"].id})`);
