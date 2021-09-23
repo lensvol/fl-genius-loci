@@ -21,13 +21,21 @@ class TrackPlayer {
     }
 
     async loadTracks(trackPaths) {
-        console.log("Trying to load tracks...");
+        console.time("[FL Genius Loci] Loading tracks");
+        const fetches = [];
 
         for (const trackPath of trackPaths) {
-            const request = await fetch(chrome.runtime.getURL("tracks/" + trackPath));
-            const buffer = await request.arrayBuffer();
-            this.buffers[trackPath] = await this.audioCtx.decodeAudioData(buffer);
+            let path = trackPath;
+            fetches.push(
+                fetch(chrome.runtime.getURL("tracks/" + trackPath))
+                    .then((resp) => resp.arrayBuffer())
+                    .then((buffer) => this.audioCtx.decodeAudioData(buffer))
+                    .then((decoded) => this.buffers[path] = decoded)
+            );
         }
+
+        await Promise.allSettled(fetches);
+        console.timeEnd("[FL Genius Loci] Loading tracks");
     }
 
     switchTracks() {
