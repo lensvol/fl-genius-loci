@@ -1,12 +1,18 @@
+const FADE_TIME = 3;
+
 class TrackPlayer {
     constructor() {
         window.AudioContext = window.AudioContext || window.webkitAudioContext;
         const context = new AudioContext();
 
-        this.source = null;
+        this.currentTrack = null;
+        this.nextTrack = null;
 
         this.gainNode = context.createGain();
         this.gainNode.connect(context.destination);
+
+        this.nextGainNode = null;
+
         this.previousGain = 1;
 
         this.buffers = new Map();
@@ -24,17 +30,42 @@ class TrackPlayer {
         }
     }
 
-    playTrack(track, loop = true) {
-        if (this.source) {
-            this.source.stop(0);
+    switchTracks() {
+        console.debug("Switching tracks...");
+
+        if (this.currentTrack) {
+            this.currentTrack.stop(0);
+            this.currentTrack.disconnect();
+            this.currentTrack = null;
+            this.gainNode = null;
         }
 
-        this.source = this.audioCtx.createBufferSource();
-        this.source.loop = loop;
-        this.source.buffer = this.buffers[track];
-        this.source.connect(this.gainNode);
-        this.gainNode.gain.value = 1;
-        this.source.start(0);
+        this.currentTrack = this.nextTrack;
+        this.gainNode = this.nextGainNode;
+        if (this.gainNode) {
+            this.gainNode.gain.linearRampToValueAtTime(0, this.audioCtx.currentTime + FADE_TIME);
+        }
+    }
+
+    playTrack(track, loop = true) {
+        this.switchTracks();
+
+        const currTime = this.audioCtx.currentTime;
+
+        const newTrack = this.audioCtx.createBufferSource();
+        newTrack.loop = loop;
+        newTrack.buffer = this.buffers[track];
+
+        const newGain = this.audioCtx.createGain();
+        newGain.gain.linearRampToValueAtTime(0, currTime);
+        newGain.gain.linearRampToValueAtTime(1, currTime + FADE_TIME);
+
+        newGain.connect(this.audioCtx.destination);
+        newTrack.connect(newGain);
+        newTrack.start(currTime);
+
+        this.nextTrack = newTrack;
+        this.nextGainNode = newGain;
     }
 
     mute() {
@@ -47,8 +78,14 @@ class TrackPlayer {
     }
 
     stop() {
-        if (this.source) {
-            this.source.stop(0);
+        if (this.currentTrack) {
+            this.currentTrack.stop(0);
+            this.currentTrack.disconnect();
+        }
+
+        if (this.nextTrack) {
+            this.nextTrack.stop(0);
+            this.nextTrack.disconnect();
         }
     }
 }
