@@ -8,77 +8,25 @@ let currentTrackPath = "";
 let isMuted = false;
 let flTabs = [];
 
-function checkFileExists(path) {
-    return new Promise((resolve, reject) => {
-        chrome.runtime.getPackageDirectoryEntry((storageRoot) => {
-            storageRoot.getFile(
-                path,
-                {create: false},
-                () => resolve({path: path, exists: true}),
-                () => resolve({path: path, exists: false})
-            )
-        });
-    });
-}
-
-async function verifyLocationTracks(tracksMapping) {
-    const locationsMissingTrack = [];
-    for (const location in tracksMapping) {
-        if (!tracksMapping[location]) {
-            continue;
-        }
-
-        const result = await checkFileExists(`tracks/${tracksMapping[location]}`);
-        if (!result.exists) {
-            locationsMissingTrack.push(location);
-        }
-    }
-
-    return locationsMissingTrack;
-}
-
 const externalMapping = new Promise((resolve, reject) => {
-    chrome.runtime.getPackageDirectoryEntry((storageRoot) => {
-        storageRoot.getFile("mappings.json", {}, (fileEntry) => {
-            fileEntry.file((f) => {
-                const reader = new FileReader();
+    fetch(chrome.runtime.getURL("mappings.json"))
+        .then((response) => response.json())
+        .then((mappings) => {
+            console.log("Loaded 'mappings.json'.");
+            if (mappings.tracks === undefined || mappings.settings === undefined || mappings.areas === undefined) {
+                console.error("Malformed 'mappings.json': Keys 'tracks', 'settings' and 'areas' should be present.");
+                resolve({tracks: {}, settings: {}, areas: {}});
+            }
 
-                reader.addEventListener("loadend", () => {
-                    console.log("Loaded 'mappings.json'.");
-                    const mappings = JSON.parse(reader.result);
-                    if (mappings.tracks === undefined || mappings.settings === undefined || mappings.areas === undefined) {
-                        console.error("Malformed 'mappings.json': Keys 'tracks', 'settings' and 'areas' should be present.");
-                        resolve({tracks: {}, settings: {}, areas: {}});
-                    }
-
-                    verifyLocationTracks(mappings.tracks)
-                        .then((locationsWithoutTracks) => {
-                            console.debug("Creating set of existing tracks...")
-                            const existingTracks = new Set();
-                            for (const location in mappings.tracks) {
-                                if (mappings.tracks[location]) {
-                                    existingTracks.add(mappings.tracks[location]);
-                                }
-                            }
-
-                            locationsWithoutTracks.forEach((location) => {
-                                console.error(`Location "${location}" is missing track: ${mappings.tracks[location]}`);
-                                // Prevent attempts to play missing tracks
-                                existingTracks.delete(mappings.tracks[location]);
-                                mappings.tracks[location] = "";
-                            })
-
-                            trackPlayer.loadTracks(existingTracks.values()).then(() => resolve(mappings));
-                        });
-                    }
-                );
-
-                reader.readAsText(f);
-            });
-        }, (exc) => {
-            console.error(exc);
-        });
-    });
+            const existingTracks = new Set();
+            for (const location in mappings.tracks) {
+                if (mappings.tracks[location]) {
+                    existingTracks.add(mappings.tracks[location]);
+                }
+            }
+            trackPlayer.loadTracks(existingTracks.values()).then(() => resolve(mappings));
+        })
+        .catch((reason) => console.error(reason));
 })
 
 function findTrackForLocation(setting, location) {
