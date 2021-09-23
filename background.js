@@ -144,5 +144,5 @@ chrome.tabs.query(
     (tabs) => tabs.map((tab) => flTabs.push(tab.id))
 );
 
-externalMapping.then(() => console.debug("[FL Genius Loci] Mappings loaded."));
+// Eagerly load mappings
 externalMapping.then(() => console.debug("[FL Genius Loci] Mappings loaded."));
