@@ -131,11 +131,12 @@ chrome.tabs.onRemoved.addListener((tabId, removeInfo) => {
     const index = flTabs.indexOf(tabId);
     if (index !== -1) {
         flTabs.splice(index, 1);
-        trackPlayer.stop();
     }
 
     if (flTabs.length === 0) {
-        trackPlayer.mute();
+        currentTrackPath = null;
+
+        trackPlayer.stop();
 
         updateBadgeTooltip();
     }
