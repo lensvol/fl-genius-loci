@@ -24,7 +24,8 @@ const externalMapping = new Promise((resolve, reject) => {
                     existingTracks.add(mappings.tracks[location]);
                 }
             }
-            trackPlayer.loadTracks(existingTracks.values()).then(() => resolve(mappings));
+
+            resolve(mappings);
         })
         .catch((reason) => console.error(reason));
 })

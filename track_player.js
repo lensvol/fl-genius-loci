@@ -15,27 +15,7 @@ class TrackPlayer {
 
         this.previousGain = 1;
 
-        this.buffers = new Map();
-
         this.audioCtx = context;
-    }
-
-    async loadTracks(trackPaths) {
-        console.time("[FL Genius Loci] Loading tracks");
-        const fetches = [];
-
-        for (const trackPath of trackPaths) {
-            let path = trackPath;
-            fetches.push(
-                fetch(chrome.runtime.getURL("tracks/" + trackPath))
-                    .then((resp) => resp.arrayBuffer())
-                    .then((buffer) => this.audioCtx.decodeAudioData(buffer))
-                    .then((decoded) => this.buffers[path] = decoded)
-            );
-        }
-
-        await Promise.allSettled(fetches);
-        console.timeEnd("[FL Genius Loci] Loading tracks");
     }
 
     switchTracks() {
@@ -56,13 +36,23 @@ class TrackPlayer {
     }
 
     playTrack(track, loop = true) {
-        this.switchTracks();
+        console.time(`Loading track ${track}`)
+        fetch(chrome.runtime.getURL("tracks/" + track))
+            .then((resp) => resp.arrayBuffer())
+            .then((buffer) => this.audioCtx.decodeAudioData(buffer))
+            .then((decoded) => {
+                this.switchTracks();
+                this.setNextTrack(decoded, loop);
+                console.timeEnd(`Loading track ${track}`)
+            });
+    }
 
+    setNextTrack(buffer, loop = true) {
         const currTime = this.audioCtx.currentTime;
 
         const newTrack = this.audioCtx.createBufferSource();
         newTrack.loop = loop;
-        newTrack.buffer = this.buffers[track];
+        newTrack.buffer = buffer;
 
         const newGain = this.audioCtx.createGain();
         newGain.gain.linearRampToValueAtTime(0, currTime);
@@ -92,12 +82,16 @@ class TrackPlayer {
     stop() {
         if (this.currentTrack) {
             this.currentTrack.stop(0);
-            this.currentTrack.disconnect();
+            this.currentTrack.disconnect(0);
+            this.currentTrack.onended = null;
+            this.currentTrack.__src = null;
         }
 
         if (this.nextTrack) {
             this.nextTrack.stop(0);
-            this.nextTrack.disconnect();
+            this.nextTrack.disconnect(0);
+            this.nextTrack.onended = null;
+            this.nextTrack.__src = null;
         }
     }
 }
