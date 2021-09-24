@@ -68,14 +68,18 @@ class TrackPlayer {
 
     mute() {
         if (this.gainNode) {
-            this.previousGain = this.gainNode.gain.value;
             this.gainNode.gain.value = 0;
+        }
+
+        if (this.nextGainNode) {
+            this.previousGain = this.nextGainNode.gain.value;
+            this.nextGainNode.gain.value = 0;
         }
     }
 
     unmute() {
-        if (this.gainNode) {
-            this.gainNode.gain.value = this.previousGain;
+        if (this.nextGainNode) {
+            this.nextGainNode.gain.value = this.previousGain;
         }
     }
 
