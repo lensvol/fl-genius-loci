@@ -101,6 +101,8 @@
         "On Deck": "",
         "Polythreme": "",
         "Port Carnelian": "",
+        "Rat Market": "",
+        "Reflection of your Laboratory": "",
         "Roads Beneath": "",
         "Shadows of the Orphanage": "",
         "Silent Corridors of the Orphanage": "",
@@ -111,8 +113,7 @@
         "VERY LITTLE SCREAMING": "",
         "Venderbright": "",
         "Working with the Clay Highwayman": "",
-        "Your Lodgings": "",
-        "Reflection of your Laboratory": ""
+        "Your Lodgings": ""
     },
     "areas": {
         "1": "New Newgate",
@@ -208,7 +209,8 @@
         "111186": "Khan's Heart",
         "111187": "Snares",
         "111194": "Copper Quarter",
-        "111195": "An Exceptional Library"
+        "111195": "An Exceptional Library",
+        "111200": "Rat Market"
     },
     "settings": {
         "2": "Fifth City",
@@ -227,6 +229,7 @@
         "107954": "Working with the Clay Highwayman",
         "107955": "Khanate (Inner)",
         "107957": "An Exceptional Library",
-        "107959": "Khanate (Copper Quarter)"
+        "107959": "Khanate (Copper Quarter)",
+        "107960": "Rat Market"
     }
 }
