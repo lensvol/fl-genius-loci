@@ -67,6 +67,10 @@ function toggleMute() {
     flTabs.map((tabId) => chrome.tabs.sendMessage(tabId, {action: "muteStatus", isMuted: isMuted}));
 }
 
+function announceTrack(text) {
+    flTabs.map((tabId) => chrome.tabs.sendMessage(tabId, {action: "track", track: text}));
+}
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "FL_GL_hello") {
         if (!flTabs.includes(sender.tab.id)) {
@@ -102,18 +106,16 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         if (location !== UNKNOWN) {
             findTrackForLocation(currentSetting, location)
                 .then(trackPath => {
-                    flTabs.map((tabId) => chrome.tabs.sendMessage(tabId, {action: "track", track: trackPath}));
-                    return trackPath;
-                })
-                .then(trackPath => {
                     if (currentTrackPath !== trackPath) {
                         console.log(`Playing track ${trackPath}`)
 
-                        trackPlayer.playTrack(trackPath);
+                        trackPlayer.playTrack(trackPath)
+                            .then(() => announceTrack(trackPath))
+                            .catch(() => announceTrack("Failed to load"))
 
                         currentTrackPath = trackPath;
                     } else {
-                        console.log("It is the same track as before!");
+                        console.log("[FL Genius Loci] It is the same track as before!");
                     }
                 })
                 .catch((error) => {
@@ -121,7 +123,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
                     trackPlayer.stop();
 
-                    flTabs.map((tabId) => chrome.tabs.sendMessage(tabId, {action: "track", track: null}));
+                    announceTrack("None assigned");
                 })
         }
     }

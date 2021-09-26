@@ -37,7 +37,7 @@ class TrackPlayer {
 
     playTrack(track, loop = true) {
         console.time(`Loading track ${track}`)
-        fetch(chrome.runtime.getURL("tracks/" + track))
+        return fetch(chrome.runtime.getURL("tracks/" + track))
             .then((resp) => resp.arrayBuffer())
             .then((buffer) => this.audioCtx.decodeAudioData(buffer))
             .then((decoded) => {
