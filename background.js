@@ -151,3 +151,7 @@ chrome.tabs.query(
 
 // Eagerly load mappings
 externalMapping.then(() => console.debug("[FL Genius Loci] Mappings loaded."));
+
+chrome.browserAction.onClicked.addListener((tab) => {
+    toggleMute();
+});
