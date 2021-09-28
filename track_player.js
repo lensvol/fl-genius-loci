@@ -1,4 +1,4 @@
-const FADE_TIME = 3;
+const FADE_TIME = 2;
 
 class TrackPlayer {
     constructor() {
