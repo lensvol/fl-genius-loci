@@ -15,6 +15,8 @@ class TrackPlayer {
 
         this.previousGain = 1;
 
+        this.isMuted = false;
+
         this.audioCtx = context;
     }
 
@@ -56,7 +58,11 @@ class TrackPlayer {
 
         const newGain = this.audioCtx.createGain();
         newGain.gain.linearRampToValueAtTime(0, currTime);
-        newGain.gain.linearRampToValueAtTime(1, currTime + FADE_TIME);
+        if (!this.isMuted) {
+            newGain.gain.linearRampToValueAtTime(1, currTime + FADE_TIME);
+        } else {
+            this.previousGain = 1;
+        }
 
         newGain.connect(this.audioCtx.destination);
         newTrack.connect(newGain);
@@ -67,6 +73,8 @@ class TrackPlayer {
     }
 
     mute() {
+        this.isMuted = true;
+
         if (this.gainNode) {
             this.gainNode.gain.value = 0;
         }
@@ -78,6 +86,8 @@ class TrackPlayer {
     }
 
     unmute() {
+        this.isMuted = false;
+
         if (this.nextGainNode) {
             this.nextGainNode.gain.value = this.previousGain;
         }
