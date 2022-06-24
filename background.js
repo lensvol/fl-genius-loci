@@ -36,10 +36,10 @@ function findTrackForLocation(setting, location) {
             .then(mapping => {
                 if (location in mapping.tracks && mapping.tracks[location] !== "") {
                     console.debug(`[FL Genius Loci] Selecting track ${mapping.tracks[location]} for "${location} (${currentSetting})"`);
-                    resolve(mapping.tracks[location])
+                    resolve(mapping.tracks[location]);
                 } else if (currentSetting in mapping.tracks && mapping.tracks[currentSetting] !== "") {
                     console.debug(`[FL Genius Loci] Location unknown, selecting track ${mapping.tracks[currentSetting]} for setting "${currentSetting}"`);
-                    resolve(mapping.tracks[currentSetting])
+                    resolve(mapping.tracks[currentSetting]);
                 }
 
                 reject("No appropriate track found.");
@@ -49,22 +49,31 @@ function findTrackForLocation(setting, location) {
 
 function updateBadgeTooltip() {
     chrome.browserAction.setBadgeText({text: isMuted ? "MUTE" : ""}, () => {});
-    chrome.browserAction.setBadgeBackgroundColor({color: isMuted ? "#ff0000" : "#0000ff"});
+    chrome.browserAction.setBadgeBackgroundColor({color: isMuted ? "red" : "black"});
 
     chrome.browserAction.setTitle({"title": `Setting: ${currentSetting}\nLocation: ${currentLocation}`}, () => {});
 }
 
+function broadcastMuteStatus() {
+    flTabs.map((tabId) => chrome.tabs.sendMessage(tabId, {action: "muteStatus", isMuted: isMuted}));
+}
+
 function toggleMute() {
+    isMuted = !isMuted;
+    updateMuteStatus();
+}
+
+function updateMuteStatus() {
     if (isMuted) {
-        isMuted = false;
-        trackPlayer.unmute();
-    } else {
-        isMuted = true;
         trackPlayer.mute();
+    } else {
+        trackPlayer.unmute();
     }
 
     updateBadgeTooltip();
-    flTabs.map((tabId) => chrome.tabs.sendMessage(tabId, {action: "muteStatus", isMuted: isMuted}));
+    broadcastMuteStatus();
+
+    localStorage.setItem("fl_gl_muteStatus", isMuted ? "on" : "off");
 }
 
 function announceTrack(text) {
@@ -148,6 +157,9 @@ chrome.tabs.query(
     {url: "*://*.fallenlondon.com/*"},
     (tabs) => tabs.map((tab) => flTabs.push(tab.id))
 );
+
+isMuted = localStorage.getItem("fl_gl_muteStatus") === "on" || false;
+updateMuteStatus();
 
 // Eagerly load mappings
 externalMapping.then(() => console.debug("[FL Genius Loci] Mappings loaded."));
