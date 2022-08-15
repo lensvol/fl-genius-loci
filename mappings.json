@@ -103,9 +103,11 @@
         "Moulin": "",
         "Polythreme": "",
         "Port Carnelian": "",
+        "Principles of Coral": "",
         "Rat Market": "",
         "Reflection of your Laboratory": "",
         "Roads Beneath": "",
+        "Salt Lions": "",
         "Shadows of the Orphanage": "",
         "Silent Corridors of the Orphanage": "",
         "Southern Archipelago": "",
@@ -200,6 +202,7 @@
         "111145": "Hurlers",
         "111146": "Marigold Station",
         "111149": "Moulin",
+        "111151": "Far Beyond the Cordon",
         "111153": "Adulterine Castle",
         "111156": "Your Cabin",
         "111157": "Home Waters",
@@ -218,7 +221,8 @@
         "111195": "An Exceptional Library",
         "111199": "a train going imprudently fast",
         "111200": "Rat Market",
-        "111206": "Cline"
+        "111206": "Cline",
+        "111208": "Salt Lions"
     },
     "settings": {
         "2": "Fifth City",
@@ -232,6 +236,7 @@
         "105926": "Void's Approach",
         "106005": "Laboratory",
         "107941": "Upper River",
+        "107949": "An Expedition into the Moulin Waste",
         "107950": "Under Parabolan Ice",
         "107951": "Aboard, at Port",
         "107952": "Zailing the Unterzee",
@@ -240,6 +245,7 @@
         "107957": "An Exceptional Library",
         "107959": "Khanate (Copper Quarter)",
         "107960": "Rat Market",
-        "107967": "Cline"
+        "107967": "Cline",
+        "107968": "Principles of Coral"
     }
 }
