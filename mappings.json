@@ -89,8 +89,8 @@
         "Elder Continent": "",
         "Evenlode": "",
         "Evenlode Courts": "",
-        "Far Beyond the Cordon": "",	   
-        "Flit": "",		   
+        "Far Beyond the Cordon": "",
+        "Flit": "",
         "Heartscross House": "",
         "Hurlers": "",
         "Insanity": "",
@@ -129,7 +129,7 @@
         "Venderbright": "",
         "Working with the Clay Highwayman": "",
         "Your Activities": "",
-        "Your Lodgings": "",
+        "Your Lodgings": ""
     },
     "areas": {
         "1": "New Newgate",
@@ -193,7 +193,7 @@
         "109643": "Tanah-Chook",
         "110041": "Court of the Wakeful Eye",
         "110082": "Medusa's Head",
-		"110903": "Arbor, of the Roses",
+	"110903": "Arbor, of the Roses",
         "111064": "Clay Quarters",
         "111065": "Moloch Street",
         "111066": "Concord Square",
