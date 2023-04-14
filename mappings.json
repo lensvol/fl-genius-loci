@@ -231,7 +231,9 @@
         "111200": "Rat Market",
         "111206": "Cline",
         "111208": "Salt Lions",
-        "111211": "Aeschaven"
+        "111211": "Aeschaven",
+        "111221": "Gaider's Mourn",
+        "111223": "Alleyways of London"
     },
     "settings": {
         "2": "Fifth City",
@@ -256,6 +258,8 @@
         "107960": "Rat Market",
         "107967": "Cline",
         "107968": "Principles of Coral",
-        "107969": "Godfall"
+        "107969": "Godfall",
+        "107971": "Gaider's Mourn",
+        "107972": "Hearts' Game"
     }
 }
