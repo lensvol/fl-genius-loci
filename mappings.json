@@ -233,7 +233,10 @@
         "111208": "Salt Lions",
         "111211": "Aeschaven",
         "111221": "Gaider's Mourn",
-        "111223": "Alleyways of London"
+        "111223": "Alleyways of London",
+        "111238": "a state of binding servitude",
+        "111240": "A Forking Future",
+        "111242": "A Mortal Future"
     },
     "settings": {
         "2": "Fifth City",
@@ -260,6 +263,8 @@
         "107968": "Principles of Coral",
         "107969": "Godfall",
         "107971": "Gaider's Mourn",
-        "107972": "Hearts' Game"
+        "107972": "Hearts' Game",
+        "107976": "Fate-Weaving",
+        "107978": "Servitude"
     }
 }
