@@ -1,0 +1,42 @@
+var ExtensionMessages = Object.freeze({
+    runtime: Object.freeze({
+        hello: "FL_GL_hello",
+        toggleMute: "FL_GL_toggleMute",
+        settingChanged: "FL_GL_setting",
+        locationChanged: "FL_GL_location",
+        volumeChanged: "FL_GL_volume",
+        saveCustomAreaAssignment: "FL_GL_saveCustomAreaAssignment",
+    }),
+    tab: Object.freeze({
+        setMapping: "setMapping",
+        muteStatus: "muteStatus",
+        track: "track",
+        requestState: "requestState",
+        volumeStatus: "volumeStatus",
+        customAreaAssignmentError: "customAreaAssignmentError",
+    }),
+    pageEvent: Object.freeze({
+        locationChanged: "FL_GL_LocationChanged",
+        settingChanged: "FL_GL_SettingChanged",
+        injected: "FL_GL_geniusLociInjected",
+        toggleMute: "FL_GL_toggleMute",
+        volumeChanged: "FL_GL_VolumeChanged",
+    }),
+    pageMessage: Object.freeze({
+        setMapping: "FL_GL_setMapping",
+        muteStatus: "FL_GL_muteStatus",
+        track: "FL_GL_track",
+        requestState: "FL_GL_requestState",
+        volumeStatus: "FL_GL_volumeStatus",
+        saveCustomAreaAssignment: "FL_GL_saveCustomAreaAssignment",
+        customAreaAssignmentSaved: "FL_GL_customAreaAssignmentSaved",
+        customAreaAssignmentError: "FL_GL_customAreaAssignmentError",
+    }),
+    audio: Object.freeze({
+        playTrack: "FL_GL_audio_playTrack",
+        mute: "FL_GL_audio_mute",
+        unmute: "FL_GL_audio_unmute",
+        setVolume: "FL_GL_audio_setVolume",
+        stop: "FL_GL_audio_stop",
+    }),
+});
