@@ -4,8 +4,10 @@
 
     transition: all .2s ease-in-out;
     line-height: 0;
+    max-height: 0;
 }
 
 .expanded {
     line-height: 1.5;
+    max-height: 24rem;
 }
